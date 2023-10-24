@@ -1,0 +1,57 @@
+name: 部署 Docker images 至 EC2
+
+on:
+  push:
+    branches:
+      - develop  
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps :
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Install SSH key
+      uses: webfactory/ssh-agent@v0.5.3
+      with:
+        ssh-private-key: ${{ secrets.DEPLOY_SSH_KEY }}
+
+    - name: Create .env file
+      run: |
+        echo VARIABLE=${{ secrets.ENV_VARIABLE }} >> .env
+      # 可加入多個環境變數
+
+    - name: Login to Docker Hub
+      uses: docker/login-action@v1 
+      with:
+        username: ${{ secrets.DOCKER_HUB_USERNAME }}
+        password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+
+    - name: Build and push Docker image
+      uses: docker/build-push-action@v2
+      with:
+        context: .
+        push: true
+        tags: ${{ secrets.DOCKER_HUB_USERNAME }}/Vcard:latest  # 使用你的 Docker Hub 使用者名稱和應用程式名稱
+
+    - name: 更新 known_hosts 文件  # 步驟的名稱
+      run: |  # 將要執行的命令
+        mkdir -p ~/.ssh  # 在用戶的主目錄下創建 .ssh 目錄，如果該目錄已存在，則不會報錯
+        ssh-keyscan ${{ secrets.HOST_NAME }} >> ~/.ssh/known_hosts  # 從指定的主機獲取公鑰，並將其追加到 known_hosts 文件中
+      # 請將 'hostname' 替換為你的服務器地址，例如 IP 地址或域名
+
+    - name: Create directory if not exists # 確保資料夾是存在的
+      run: ssh root@${{ secrets.HOST_NAME }} "mkdir -p ~/websample/node-env/"
+
+    - name: Transfer .env file # 上傳環境變數
+      run: scp .env root@${{ secrets.HOST_NAME }}:~/websample/node-env/
+
+    - name: Deploy to Docker
+      run: |
+        ssh root@${{ secrets.HOST_NAME }} '
+          docker pull ${{ secrets.DOCKER_HUB_USERNAME }}/Vcard:latest
+          docker rm -f github-ac-sample || true
+          docker run -d -p 3003:3000 --name github-ac-sample --env-file $HOME/websample/node-env/.env ${{ secrets.DOCKER_HUB_USERNAME }}/Vcard:latest
+        '
+      # Docker 指令中，不能使用 `~` 路徑，可以使用 $Home 作為替代
