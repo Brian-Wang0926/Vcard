@@ -12,6 +12,26 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v2
 
+      # 前端缓存
+      - name: Cache Node.js modules for frontend
+        uses: actions/cache@v2
+        with:
+          path: ~/.npm
+          key: ${{ runner.OS }}-node-${{ hashFiles('./client/package-lock.json') }}-${{ github.head_ref }}
+          restore-keys: |
+            ${{ runner.OS }}-node-${{ hashFiles('./client/package-lock.json') }}-
+            ${{ runner.OS }}-node-
+
+      # 后端缓存
+      - name: Cache Node.js modules for backend
+        uses: actions/cache@v2
+        with:
+          path: ~/.npm
+          key: ${{ runner.OS }}-node-${{ hashFiles('./server/package-lock.json') }}-${{ github.head_ref }}
+          restore-keys: |
+            ${{ runner.OS }}-node-${{ hashFiles('./server/package-lock.json') }}-
+            ${{ runner.OS }}-node-
+
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v1
 
@@ -47,7 +67,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Executing remote SSH commands to deploy
-      uses: appleboy/ssh-action@master
+      uses: appleboy/ssh-action@v0.1.4
       with:
         debug: true
         host: ${{ secrets.SSH_HOST }}
