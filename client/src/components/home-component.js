@@ -4,8 +4,10 @@ const HomeComponent = () => {
   const [text, setText] = useState("");
   const [image, setImage] = useState(null);
   const [posts, setPosts] = useState([]);
+  const [refreshPosts, setrefreshPosts] = useState(false);
   const fileInputRef = useRef(null);
   const textInputRef = useRef(null);
+
 
   const handleText = (e) => {
     setText(e.target.value);
@@ -15,12 +17,20 @@ const HomeComponent = () => {
     setImage(e.target.files[0]);
   };
 
-  const fetchData = async () => {
-    const response = await fetch("/api/getAllPosts");
-    const data = await response.json();
-    console.log("前端取得資料", data);
-    setPosts(data);
-  };
+  useEffect(() => {
+    const fetchData = async () => {
+      const response = await fetch("/api/getAllPosts");
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+      const data = await response.json();
+      console.log("前端取得資料", data);
+      setPosts(data);
+      setrefreshPosts(false);
+    };
+
+    fetchData();
+  }, [refreshPosts]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -37,7 +47,7 @@ const HomeComponent = () => {
     if (response.ok) {
       console.log("ok");
       // 提交成功直接執行取得資料
-      fetchData();
+      setrefreshPosts(true);
       setText("");
       setImage(null);
       fileInputRef.current.value = "";
@@ -46,10 +56,6 @@ const HomeComponent = () => {
       console.log("not ok");
     }
   };
-
-  useEffect(() => {
-    fetchData();
-  }, []);
 
   return (
     <div style={{ margin: "100px" }}>
