@@ -60,7 +60,7 @@ const HomeComponent = () => {
   return (
     <div style={{ margin: "100px" }}>
       <form onSubmit={handleSubmit}>
-        <h2>測試github action3 發表一篇圖文</h2>
+        <h2>測試github action5 發表一篇圖文</h2>
         <br />
         <div className="form-group">
           <label>文字內容:</label>
