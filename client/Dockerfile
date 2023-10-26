@@ -18,4 +18,4 @@ FROM nginx:stable
 COPY --from=build /usr/src/app/build /usr/share/nginx/html
 
 # 默认情况下，Nginx将在80端口上运行，无需EXPOSE命令
-# 您可以根据需要自定义Nginx配置
+# 您可以根据需要自定义Nginx配置ㄒ
