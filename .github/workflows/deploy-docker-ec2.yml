@@ -103,7 +103,7 @@ jobs:
       # 使用Docker Compose構建Docker映像
       - name: Build Docker images
         run: |
-          docker-compose -f "${{ github.workspace }}/docker-compose.yml" up --build
+          docker-compose -f "${{ github.workspace }}/docker-compose.yml" build
           docker-compose -f "${{ github.workspace }}/docker-compose.yml" push
         working-directory: "${{ github.workspace }}" # 替換成你的項目路徑
 
