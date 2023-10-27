@@ -107,6 +107,15 @@ jobs:
           username: ${{ secrets.DOCKER_HUB_USERNAME }}
           password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
 
+      # - name: Upload config.env to EC2
+      #   uses: appleboy/scp-action@v0.3.0
+      #   with:
+      #     host: ${{ secrets.SSH_HOST }}
+      #     username: ${{ secrets.SSH_USER }}
+      #     key: ${{ secrets.SSH_PRIVATE_KEY }}
+      #     source: ${{ github.workspace }}/config.env
+      #     target: /path-on-ec2/config.env
+
   deploy:
     needs: build-and-push
     runs-on: ubuntu-latest
