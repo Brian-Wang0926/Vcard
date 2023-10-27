@@ -135,4 +135,4 @@ jobs:
     #       docker-compose up -d
     - name: SSH into EC2 and Deploy
       run: |
-        cd /Users/wangbaiyuan/Document && ssh -i "Vcard.pem" ec2-user@ec2-35-79-74-83.ap-northeast-1.compute.amazonaws.com "cd my_docker_project && docker-compose down && docker-compose pull && docker-compose up -d"
+        ssh -i ${{ secrets.SSH_PRIVATE_KEY }} ec2-user@ec2-35-79-74-83.ap-northeast-1.compute.amazonaws.com "cd my_docker_project && docker-compose down && docker-compose pull && docker-compose up -d"
