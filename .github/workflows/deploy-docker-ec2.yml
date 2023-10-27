@@ -128,6 +128,8 @@ jobs:
         username: ${{ secrets.SSH_USER }}
         key: ${{ secrets.SSH_PRIVATE_KEY }}
         script: |
+          echo "Debug Info: Variable Value"
           cd my_docker_project
+          docker-compose down
           docker-compose pull
           docker-compose up -d
