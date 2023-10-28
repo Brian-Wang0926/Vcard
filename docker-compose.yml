@@ -9,10 +9,10 @@ services:
       - "3000:3000" # 假設您的前端應用運行在 3000 端口，這將主機的 3000 端口映射到容器的 3000 端口
     networks:
       - app-network
-    env_file: # 指定包含环境变量的文件
-      - ./client/.env # 这是相对于 docker-compose.yml 文件的路径
+    # env_file: # 指定包含环境变量的文件
+    #   - ./client/.env # 这是相对于 docker-compose.yml 文件的路径
     restart: on-failure 
-    
+
   backend:
     image: boyuan0926/backend:latest
     build:
@@ -22,8 +22,8 @@ services:
       - "3005:3005" # 將主機的 3005 端口映射到容器的 3005 端口
     networks:
       - app-network
-    env_file: # 指定包含环境变量的文件
-      - ./server/.env # 这是相对于 docker-compose.yml 文件的路径
+    # env_file: # 指定包含环境变量的文件
+    #   - ./server/.env # 这是相对于 docker-compose.yml 文件的路径
     restart: on-failure
 
 
