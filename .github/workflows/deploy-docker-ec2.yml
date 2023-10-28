@@ -134,4 +134,7 @@ jobs:
       #       docker-compose up -d
       - name: SSH into EC2 and Deploy
         run: |
-          ssh -i ${{ secrets.SSH_PRIVATE_KEY }} ec2-user@${{ secrets.SSH_HOST }} "cd my_docker_project && docker-compose down && docker-compose pull && docker-compose up -d"
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > private_key.pem
+          chmod 600 private_key.pem
+          ssh -i private_key.pem ec2-user@${{ secrets.SSH_HOST }} "cd my_docker_project && docker-compose down && docker-compose pull && docker-compose up -d"
+          rm -f private_key.pem
