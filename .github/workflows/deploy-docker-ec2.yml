@@ -12,6 +12,9 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v2
 
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+
       - name: Login to DockerHub
         uses: docker/login-action@v1
         with:
@@ -21,9 +24,9 @@ jobs:
       # 使用Docker Compose構建Docker映像
       - name: Build Docker images
         run: |
-          docker-compose -f "${{ github.workspace }}/docker-compose.yml" build
-          docker-compose -f "${{ github.workspace }}/docker-compose.yml" push
-        working-directory: "${{ github.workspace }}" # 替換成你的項目路徑
+          export DOCKER_BUILDKIT=0
+          docker-compose -f docker-compose.yml build --no-cache
+          docker-compose -f docker-compose.yml push
 
   deploy:
     needs: build-and-push
