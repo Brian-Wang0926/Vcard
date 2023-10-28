@@ -87,24 +87,24 @@ on:
       - develop
 
 jobs:
-  # build-and-push:
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - name: Checkout Repository
-  #       uses: actions/checkout@v2
+  build-and-push:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
 
-  #     - name: Login to DockerHub
-  #       uses: docker/login-action@v1
-  #       with:
-  #         username: ${{ secrets.DOCKER_HUB_USERNAME }}
-  #         password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+      - name: Login to DockerHub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKER_HUB_USERNAME }}
+          password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
 
-  #     # 使用Docker Compose構建Docker映像
-  #     - name: Build Docker images
-  #       run: |
-  #         docker-compose -f "${{ github.workspace }}/docker-compose.yml" build
-  #         docker-compose -f "${{ github.workspace }}/docker-compose.yml" push
-  #       working-directory: "${{ github.workspace }}" # 替換成你的項目路徑
+      # 使用Docker Compose構建Docker映像
+      - name: Build Docker images
+        run: |
+          docker-compose -f "${{ github.workspace }}/docker-compose.yml" build
+          docker-compose -f "${{ github.workspace }}/docker-compose.yml" push
+        working-directory: "${{ github.workspace }}" # 替換成你的項目路徑
 
       # - name: Upload config.env to EC2
       #   uses: appleboy/scp-action@v0.3.0
