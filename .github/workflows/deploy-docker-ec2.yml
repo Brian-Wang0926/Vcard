@@ -100,20 +100,30 @@ jobs:
           password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
 
       # 使用Docker Compose構建Docker映像
-      - name: Build Docker images
-        run: |
-          docker-compose -f "${{ github.workspace }}/docker-compose.yml" build
-          docker-compose -f "${{ github.workspace }}/docker-compose.yml" push
-        working-directory: "${{ github.workspace }}" # 替換成你的項目路徑
+      # - name: Build Docker images
+      #   run: |
+      #     docker-compose -f "${{ github.workspace }}/docker-compose.yml" build
+      #     docker-compose -f "${{ github.workspace }}/docker-compose.yml" push
+      #   working-directory: "${{ github.workspace }}" # 替換成你的項目路徑
 
-      # - name: Upload config.env to EC2
-      #   uses: appleboy/scp-action@v0.3.0
-      #   with:
-      #     host: ${{ secrets.SSH_HOST }}
-      #     username: ${{ secrets.SSH_USER }}
-      #     key: ${{ secrets.SSH_PRIVATE_KEY }}
-      #     source: ${{ github.workspace }}/config.env
-      #     target: /path-on-ec2/config.env
+      # 构建和推送前端镜像
+      - name: Build and Push Docker image for Frontend
+        uses: docker/build-push-action@v2
+        with:
+          context: ./client
+          file: ./client/Dockerfile
+          push: true
+          tags: boyuan0926/frontend:latest
+
+      # 构建和推送后端镜像
+      - name: Build and Push Docker image for Backend
+        uses: docker/build-push-action@v2
+        with:
+          context: ./server
+          file: ./server/Dockerfile
+          push: true
+          tags: boyuan0926/backend:latest      
+
 
   deploy:
     needs: build-and-push
