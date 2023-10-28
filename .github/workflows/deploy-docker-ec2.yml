@@ -132,7 +132,7 @@ jobs:
       #       docker-compose up -d
 
         - name: SSH into EC2 and Deploy
-           env:
+            env:
               SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
               SSH_HOST: ${{ secrets.SSH_HOST }}
             run: |
@@ -146,26 +146,20 @@ jobs:
 
               echo "Initiating SSH connection..."
               ssh_output=$(ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ec2-user@$SSH_HOST 2>&1 <<'ENDSSH'
+              set -e  # it will ensure that the script stops on the first error encountered
               echo "Navigating to project directory..."
-              cd my_docker_project
-              if [ $? -eq 0 ]; then
-                echo "Directory exists. Continuing..."
-                docker-compose down
-                docker-compose pull
-                docker-compose up -d
-              else
-                echo "Directory does not exist. Exiting..."
-                exit 1
-              fi
+              cd my_docker_project && echo "Directory exists. Continuing..." && docker-compose down && docker-compose pull && docker-compose up -d
               ENDSSH
               )
 
               echo "SSH command output: $ssh_output"
 
-            # Check if the ssh command completed successfully
-              if [[ $ssh_output == *"Exiting..."* ]]; then
-                echo "Error: SSH command did not complete successfully."
+              if [[ $ssh_output == *"could not"* ]] || [[ $ssh_output == *"error"* ]] || [[ $ssh_output == *"Exiting..."* ]]; then
+                echo "Error: SSH command encountered an error."
+                echo "$ssh_output"
                 exit 1
+              else
+                echo "SSH command completed successfully."
               fi
 
               echo "Removing private key..."
