@@ -119,50 +119,14 @@ jobs:
     needs: build-and-push
     runs-on: ubuntu-latest
     steps:
-      # - name: SSH into EC2 and Deploy
-      #   uses: appleboy/ssh-action@v0.1.4
-      #   with:
-      #     host: ${{ secrets.SSH_HOST }}
-      #     username: ec2-user
-      #     key: ${{ secrets.SSH_PRIVATE_KEY }}
-      #     script: |
-      #       cd my_docker_project
-      #       docker-compose down
-      #       docker-compose pull
-      #       docker-compose up -d
-
-        - name: SSH into EC2 and Deploy
-          env:
-            SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-            SSH_HOST: ${{ secrets.SSH_HOST }}
-          run: |
-            set -x  
-            echo "Creating SSH directory and private key file..."
-            mkdir -p ~/.ssh
-            echo "$SSH_PRIVATE_KEY" | tr -d '\r' > ~/.ssh/id_rsa
-            chmod 600 ~/.ssh/id_rsa
-            
-            echo "Adding host to known_hosts..."
-            ssh-keyscan -t rsa $SSH_HOST >> ~/.ssh/known_hosts
-            
-            echo "Initiating SSH connection..."
-            ssh_output=$(ssh -v -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ec2-user@$SSH_HOST 2>&1 <<'ENDSSH'
-            set -e  # it will ensure that the script stops on the first error encountered
-            echo "Navigating to project directory..."
-            cd my_docker_project && echo "Directory exists. Continuing..." && docker-compose down && docker-compose pull && docker-compose up -d
-            ENDSSH
-            )
-            
-            echo "SSH command output: $ssh_output"
-            
-            if [[ $ssh_output == *"could not"* ]] || [[ $ssh_output == *"error"* ]] || [[ $ssh_output == *"Exiting..."* ]]; then
-              echo "Error: SSH command encountered an error."
-              echo "$ssh_output"
-              exit 1
-            else
-              echo "SSH command completed successfully."
-            fi
-            
-            echo "Removing private key..."
-            rm -f ~/.ssh/id_rsa         
-          shell: /usr/bin/bash -e {0}
+    - name: executing remote ssh commands
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.SSH_HOST }}
+        username: ec2-user
+        key: ${{ secrets.SSH_PRIVATE_KEY }}
+        script: |
+          cd my_docker_project
+          docker-compose down
+          docker-compose pull
+          docker-compose up -d
