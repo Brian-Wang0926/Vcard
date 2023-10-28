@@ -119,22 +119,34 @@ jobs:
     needs: build-and-push
     runs-on: ubuntu-latest
     steps:
-      # - name: Executing remote SSH commands to deploy
+      # - name: SSH into EC2 and Deploy
       #   uses: appleboy/ssh-action@v0.1.4
       #   with:
-      #     debug: true
       #     host: ${{ secrets.SSH_HOST }}
-      #     username: ${{ secrets.SSH_USER }}
+      #     username: ec2-user
       #     key: ${{ secrets.SSH_PRIVATE_KEY }}
       #     script: |
-      #       echo "Debug Info: Variable Value"
       #       cd my_docker_project
       #       docker-compose down
       #       docker-compose pull
       #       docker-compose up -d
       - name: SSH into EC2 and Deploy
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
         run: |
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" > private_key.pem
-          chmod 600 private_key.pem
-          ssh -i private_key.pem ec2-user@${{ secrets.SSH_HOST }} "cd my_docker_project && docker-compose down && docker-compose pull && docker-compose up -d"
-          rm -f private_key.pem
+          set -e
+
+          mkdir -p ~/.ssh
+          echo "$SSH_PRIVATE_KEY" | tr -d '\r' > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+
+          ssh-keyscan -t rsa ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts
+
+          ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ec2-user@${{ secrets.SSH_HOST }} <<'ENDSSH'
+          cd my_docker_project
+          docker-compose down
+          docker-compose pull
+          docker-compose up -d
+          ENDSSH
+          
+          rm -f ~/.ssh/id_rsa
