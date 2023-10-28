@@ -35,5 +35,8 @@
       "last 1 safari version"
     ]
   },
-  "proxy": "http://backend:3005"
+  "proxy": "http://backend:3005",
+  "devDependencies": {
+    "@babel/plugin-transform-private-property-in-object": "^7.22.11"
+  }
 }
