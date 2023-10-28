@@ -132,38 +132,41 @@ jobs:
       #       docker-compose up -d
 
         - name: SSH into EC2 and Deploy
-          env:
-            SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-          run: |
-            set -e
+           env:
+              SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+              SSH_HOST: ${{ secrets.SSH_HOST }}
+            run: |
+              echo "Creating SSH directory and private key file..."
+              mkdir -p ~/.ssh
+              echo "$SSH_PRIVATE_KEY" | tr -d '\r' > ~/.ssh/id_rsa
+              chmod 600 ~/.ssh/id_rsa
 
-            echo "Creating SSH directory and private key file..."
-            mkdir -p ~/.ssh
-            echo "$SSH_PRIVATE_KEY" | tr -d '\r' > ~/.ssh/id_rsa
-            chmod 600 ~/.ssh/id_rsa
+              echo "Adding host to known_hosts..."
+              ssh-keyscan -t rsa $SSH_HOST >> ~/.ssh/known_hosts
 
-            echo "Adding host to known_hosts..."
-            ssh-keyscan -t rsa ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts
+              echo "Initiating SSH connection..."
+              ssh_output=$(ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ec2-user@$SSH_HOST 2>&1 <<'ENDSSH'
+              echo "Navigating to project directory..."
+              cd my_docker_project
+              if [ $? -eq 0 ]; then
+                echo "Directory exists. Continuing..."
+                docker-compose down
+                docker-compose pull
+                docker-compose up -d
+              else
+                echo "Directory does not exist. Exiting..."
+                exit 1
+              fi
+              ENDSSH
+              )
 
-            echo "Initiating SSH connection..."
-            ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ec2-user@${{ secrets.SSH_HOST }} <<'ENDSSH'
-            set -e  # it will ensure that the script stops on the first error
-            echo "Navigating to project directory..."
-            if cd my_docker_project; then
-              echo "Directory exists. Continuing..."
-              docker-compose down
-              docker-compose pull
-              docker-compose up -d
-            else
-              echo "Directory does not exist. Exiting..."
-              exit 1
-            fi
-            ENDSSH
+              echo "SSH command output: $ssh_output"
 
-            if [ $? -ne 0 ]; then
-              echo "SSH command failed"
-              exit 1
-            fi
+            # Check if the ssh command completed successfully
+              if [[ $ssh_output == *"Exiting..."* ]]; then
+                echo "Error: SSH command did not complete successfully."
+                exit 1
+              fi
 
-            echo "Removing private key..."
-            rm -f ~/.ssh/id_rsa
+              echo "Removing private key..."
+              rm -f ~/.ssh/id_rsa
