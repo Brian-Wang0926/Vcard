@@ -79,7 +79,6 @@
 #           docker-compose pull
 #           docker-compose up -d
 
-
 name: CI/CD Pipeline
 
 on:
@@ -120,19 +119,19 @@ jobs:
     needs: build-and-push
     runs-on: ubuntu-latest
     steps:
-    # - name: Executing remote SSH commands to deploy
-    #   uses: appleboy/ssh-action@v0.1.4
-    #   with:
-    #     debug: true
-    #     host: ${{ secrets.SSH_HOST }}
-    #     username: ${{ secrets.SSH_USER }}
-    #     key: ${{ secrets.SSH_PRIVATE_KEY }}
-    #     script: |
-    #       echo "Debug Info: Variable Value"
-    #       cd my_docker_project
-    #       docker-compose down
-    #       docker-compose pull
-    #       docker-compose up -d
-    - name: SSH into EC2 and Deploy
-      run: |
-        ssh -i ${{ secrets.SSH_PRIVATE_KEY }} ec2-user@ec2-35-79-74-83.ap-northeast-1.compute.amazonaws.com "cd my_docker_project && docker-compose down && docker-compose pull && docker-compose up -d"
+      # - name: Executing remote SSH commands to deploy
+      #   uses: appleboy/ssh-action@v0.1.4
+      #   with:
+      #     debug: true
+      #     host: ${{ secrets.SSH_HOST }}
+      #     username: ${{ secrets.SSH_USER }}
+      #     key: ${{ secrets.SSH_PRIVATE_KEY }}
+      #     script: |
+      #       echo "Debug Info: Variable Value"
+      #       cd my_docker_project
+      #       docker-compose down
+      #       docker-compose pull
+      #       docker-compose up -d
+      - name: SSH into EC2 and Deploy
+        run: |
+          ssh -i ${{ secrets.SSH_PRIVATE_KEY }} ec2-user@${{ secrets.SSH_HOST }}"cd my_docker_project && docker-compose down && docker-compose pull && docker-compose up -d"
