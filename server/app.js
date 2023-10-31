@@ -1,12 +1,26 @@
 const express = require("express");
 const app = express();
-const PORT = 3005;
 const dotenv = require("dotenv");
 dotenv.config();
 const cors = require("cors");
 const multer = require("multer");
 const upload = multer({ storage: multer.memoryStorage() });
 const mysql = require("mysql");
+const mongoose = require("mongoose");
+
+require("./config/passport");
+const passport = require("passport");
+
+const authRoutes = require("./routes/auth-route");
+
+mongoose
+  .connect("mongodb://localhost:27017/Vcard")
+  .then(() => {
+    console.log("連結到mongodb...");
+  })
+  .catch((e) => {
+    console.log(e);
+  });
 
 // 建立資料庫連結
 const db = mysql.createConnection({
@@ -39,7 +53,14 @@ const s3Client = new S3Client({
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cors());
+app.use(passport.initialize());
 
+app.use("/api/auth", authRoutes);
+
+
+
+
+// 週作業，暫時放這
 app.get("/api/getAllPosts", (req, res) => {
   db.query("SELECT * FROM text_table ORDER BY id DESC", (err, results) => {
     if (err) {
@@ -90,6 +111,7 @@ app.post("/api/post", upload.single("image"), async (req, res) => {
   return res.send("Post successfully saved");
 });
 
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}.`);
+
+app.listen(3005, () => {
+  console.log(`Server is running on port 3005.`);
 });
