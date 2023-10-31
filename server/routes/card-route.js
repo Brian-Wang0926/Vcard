@@ -1,9 +1,17 @@
 const express = require("express");
-const app = express();
+const router = express.Router();
+const cron = require('node-cron');
 const cardController = require("../controllers/card-controller");
 
-app.get('/checkEligibility/:userId', cardController.checkEligibility);
+// 在每天11:59執行抽卡
+// cron.schedule('59 23 * * *', cardController.pairUsers);
 
-app.get('/pairUsers', cardController.pairUsers);
+router.get('/checkEligibility/:userId', cardController.checkEligibility);
 
-module.exports = app;
+router.get('/pairUsers', cardController.pairUsers);
+
+router.get('/getPairs/:userId', cardController.getPairs);
+
+router.post('/accept', cardController.agreePairs);
+  
+module.exports = router;

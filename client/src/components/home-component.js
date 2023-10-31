@@ -76,6 +76,32 @@ function HomeComponent({ currentUser, setCurrentUser }) {
   // };
 
   return (
+    <div className=" bg-blue-900 min-h-screen p-5">
+      <div className="flex mx-auto max-w-screen-xl">
+        <div className="flex-none w-1/4 mr-5">
+          <BoardList setSelectedBoard={setSelectedBoard} />
+        </div>
+        <div className="flex-grow">
+          <ArticleList board={selectedBoard} />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function BoardList({ setSelectedBoard }) {
+  const boards = ["心情", "閒聊", "八卦"]; // 這裡可以從API或其他地方取得看板列表
+
+  return (
+    <div className=" bg-blue-900  rounded-lg p-4 my-2 text-white">
+      <h1 className="mb-4">看版列表</h1>
+      {boards.map((board) => (
+        <div key={board} onClick={() => setSelectedBoard(board)}>
+          {board}
+        </div>
+      ))}
+    </div>
+
     // <div style={{ margin: "100px" }}>
     //   <form onSubmit={handleSubmit}>
     //     <h2>github action6 發表一篇圖文</h2>
@@ -122,31 +148,6 @@ function HomeComponent({ currentUser, setCurrentUser }) {
     //     ))}
     //   </div>
     // </div>
-    <div className=" bg-blue-900 min-h-screen p-5">
-      <div className="flex mx-auto max-w-screen-xl">
-        <div className="flex-none w-1/4 mr-5">
-          <BoardList setSelectedBoard={setSelectedBoard} />
-        </div>
-        <div className="flex-grow">
-          <ArticleList board={selectedBoard} />
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function BoardList({ setSelectedBoard }) {
-  const boards = ["心情", "閒聊", "八卦"]; // 這裡可以從API或其他地方取得看板列表
-
-  return (
-    <div className=" bg-blue-900  rounded-lg p-4 my-2 text-white">
-      <h1 className="mb-4">看版列表</h1>
-      {boards.map((board) => (
-        <div key={board} onClick={() => setSelectedBoard(board)}>
-          {board}
-        </div>
-      ))}
-    </div>
   );
 }
 

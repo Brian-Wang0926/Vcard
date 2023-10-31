@@ -33,7 +33,7 @@ const userSchema = new Schema({
     type: Boolean,
     default: true,
   },
-  // 以抽卡id列表
+  // 已經抽卡id列表
   cardsDrawn: [
     {
       type: Schema.Types.ObjectId,
