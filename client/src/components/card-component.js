@@ -51,19 +51,22 @@ const CardComponent = (props) => {
         console.error("Error fetching pair:", error);
       }
     }
-
     fetchPair();
   }, [userId]);
 
   return (
-    <div>
+    <div className="max-w-screen-xl mx-auto mt-4">
       {pairedUser ? (
-        <div>
-          <h1>{pairedUser.name}</h1>
-          <h3>{pairedUser.email}</h3>
-          <img src={pairedUser.thumbnail} alt="{pairedUser.name}" className="w-52 h-52 rounded-full object-cover"/>
+        <div className="flex flex-col items-center">
+          <h1 className="text-center my-2">{pairedUser.name}</h1>
+          <h3 className="text-center my-2">{pairedUser.email}</h3>
+          <img
+            src={pairedUser.thumbnail}
+            alt="{pairedUser.name}"
+            className=" my-4 w-52 h-52 rounded-full object-cover"
+          />
           <button
-            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded disabled:opacity-50"
+            className="bg-blue-500 hover:bg-blue-700 text-white font-bold my-2 py-2 px-4 rounded disabled:opacity-50"
             onClick={handleSendInvite}
             disabled={inviteStatus === "已發送"}
           >
