@@ -15,12 +15,10 @@ function HomeComponent({ currentUser, setCurrentUser }) {
   useEffect(() => {
     const token = searchParams.get("token");
     const name = searchParams.get("name");
-    const email = searchParams.get("email");
-    const image = searchParams.get("image");
     const id = searchParams.get("id");
     // 如果 token 存在，儲存到 localStorage
     if (token) {
-      const Obj = { token: token, name, email, image, id };
+      const Obj = { token: token, name, id };
       localStorage.setItem("user", JSON.stringify(Obj));
       console.log("已將token存進localStorage");
       setCurrentUser(AuthService.getCurrentUser());

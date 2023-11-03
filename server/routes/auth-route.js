@@ -16,4 +16,8 @@ router.get(
   })
 );
 
+// 建立模擬使用者
+router.post("/mock", authController.mockLogin);
+
+
 module.exports = router;

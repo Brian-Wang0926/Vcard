@@ -19,6 +19,7 @@ const userSchema = new Schema({
   },
   thumbnail: {
     type: String,
+    default: "https://cdn3.iconfinder.com/data/icons/feather-5/24/user-512.png",
   },
   date: {
     type: Date,
@@ -35,6 +36,12 @@ const userSchema = new Schema({
   },
   // 已經抽卡id列表
   cardsDrawn: [
+    {
+      type: Schema.Types.ObjectId,
+      ref: "User",
+    },
+  ],
+  friends: [
     {
       type: Schema.Types.ObjectId,
       ref: "User",

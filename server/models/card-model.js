@@ -16,10 +16,9 @@ const cardSchema = new Schema({
     type: Date,
     default: Date.now,
   },
-  status: {
-    type: String,
-    default: "pending",
-    enum: ["pending", "accepted", "rejected"], // 卡片的狀態可以是"待定"、"已接受"或"已拒絕"
+  status: {   //是否配對成功( true 成功、false 失敗)
+    type: Boolean,
+    default: false,
   },
   acceptedBy: [
     {

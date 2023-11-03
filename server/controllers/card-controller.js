@@ -1,9 +1,12 @@
+// 若最後有一個沒有抽到卡
+
 const User = require("../models/user-model");
 const Card = require("../models/card-model");
 
 const checkEligibility = async (req, res) => {
   try {
-    const user = await User.findById(req.params.userId);
+    const userId = req.userId;
+    const user = await User.findById(userId);
 
     const currentDate = new Date();
     const diffTime = Math.abs(currentDate - user.lastActiveDate);
@@ -16,6 +19,7 @@ const checkEligibility = async (req, res) => {
     }
 
     await user.save();
+    console.log("已確認可參加抽卡名單");
     res.json({ eligibleForCard: user.eligibleForCard });
   } catch (e) {
     console.error("Error during checking:", e);
@@ -91,7 +95,7 @@ const pairUsers = async (req, res) => {
     // Batch insert and batch update
     await Card.insertMany(newCards);
     await Promise.all(updateUserPromises);
-
+    console.log("已完成配對");
     res.json({ message: "Pairing completed.", pairs: pairedResults });
   } catch (e) {
     console.error("Error during pairing:", e);
@@ -101,8 +105,10 @@ const pairUsers = async (req, res) => {
 
 const getPairs = async (req, res) => {
   try {
+    const userId = req.userId;
+    console.log("getPairs", userId);
     const cards = await Card.find({
-      $or: [{ userID1: req.params.userId }, { userID2: req.params.userId }],
+      $or: [{ userID1: userId }, { userID2: userId }],
     }).populate("userID1 userID2");
     res.json(cards);
   } catch (e) {
@@ -113,16 +119,30 @@ const getPairs = async (req, res) => {
 
 const agreePairs = async (req, res) => {
   const cardId = req.body.cardId;
-  const userId = req.body.userId;
+  const userId = req.userId;
 
   const card = await Card.findById(cardId);
   if (card) {
     if (!card.acceptedBy.includes(userId)) {
       card.acceptedBy.push(userId);
     }
+    // 當兩位使用者都接受配對時
+    if (card.acceptedBy.length === 2 && !card.status) {
+      card.status = true;
 
-    if (card.acceptedBy.length === 2) {
-      card.status = "accepted";
+      // 將兩名用戶新增至彼此的好友列表
+      const user1 = await User.findById(card.userID1);
+      const user2 = await User.findById(card.userID2);
+
+      if (!user1.friends.includes(user2._id)) {
+        user1.friends.push(user2._id);
+        await user1.save();
+      }
+
+      if (!user2.friends.includes(user1._id)) {
+        user2.friends.push(user1._id);
+        await user2.save();
+      }
     }
     await card.save();
 
