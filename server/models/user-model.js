@@ -25,6 +25,7 @@ const userSchema = new Schema({
     type: Date,
     default: Date.now,
   },
+  // 最近登入時間(抽卡用)
   lastActiveDate: {
     type: Date,
     default: Date.now,

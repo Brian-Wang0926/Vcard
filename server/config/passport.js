@@ -17,6 +17,7 @@ passport.use(
 
       if (existingUser) {
         console.log("使用者已經註冊過了，無需存入資料庫");
+        // 更新"最近登入時間"
         existingUser.lastActiveDate = new Date();
         await existingUser.save();
         return done(null, existingUser);

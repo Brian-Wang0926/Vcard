@@ -1,7 +1,6 @@
 // const logOpenHandles = require("why-is-node-running");
 jest.setTimeout(60000);
 
-
 const request = require("supertest");
 const app = require("./app");
 const User = require("./models/user-model");
@@ -28,7 +27,6 @@ describe("Card Pairing", () => {
         name: `Test User ${i}`,
         googleID: `google-id-${i}`,
         email: `test${i}@example.com`,
-        thumbnail: `thumbnail-url-${i}`,
       });
     }
     await User.insertMany(users);
@@ -55,10 +53,25 @@ describe("Card Pairing", () => {
     console.log(`Time taken for pairing ${num} users: ${end - start}ms`);
   };
 
-  it("should pair 100,000 users correctly", async () => {
+  // it("should pair 100,000 users correctly", async () => {
+  //   await testPairing(100000);
+  // }, 120000);
+
+  // it("should pair 100 users correctly", async () => {
+  //   await testPairing(100);
+  // }, 120000);
+
+  it("should pair 10 users correctly", async () => {
     await testPairing(10);
   }, 120000);
 
+  // it("should pair 9 users correctly", async () => {
+  //   await testPairing(9);
+  // }, 120000);
+
+  // it("should pair 0 users correctly", async () => {
+  //   await testPairing(0);
+  // }, 120000);
 
   afterAll(async () => {
     // await User.deleteMany({});

@@ -1,29 +1,58 @@
-// 若最後有一個沒有抽到卡
+// 若checkEligibility完成後 eligibleForCard = true 的數量為奇數，
+// 代表會有一個人無法配對，就會去 eligibleForCard = false 的使用者中，
+// 找到 lastActiveDate 最近的一名使用者，將他的eligibleForCard 改為 true
 
 const User = require("../models/user-model");
 const Card = require("../models/card-model");
 
 const checkEligibility = async (req, res) => {
   try {
-    const userId = req.userId;
-    const user = await User.findById(userId);
-
+    const users = await User.find({}, "lastActiveDate eligibleForCard");
     const currentDate = new Date();
-    const diffTime = Math.abs(currentDate - user.lastActiveDate);
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
-    if (diffDays > 3) {
-      user.eligibleForCard = false;
-    } else {
-      user.eligibleForCard = true;
+    let eligibleCount = 0;
+
+    const bulkUpdateOperations = users.map((user) => {
+      const diffTime = Math.abs(currentDate - user.lastActiveDate);
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+      if (diffDays > 3) {
+        user.eligibleForCard = false;
+      } else {
+        user.eligibleForCard = true;
+        eligibleCount++;
+      }
+
+      return {
+        updateOne: {
+          filter: { _id: user._id },
+          update: {
+            $set: {
+              eligibleForCard: user.eligibleForCard,
+            },
+          },
+        },
+      };
+    });
+
+    await User.bulkWrite(bulkUpdateOperations);
+
+    // 如果 eligibleForCard = true 的用户数量是奇数，找出一个未获得资格但最近活跃的用户，给予抽卡资格
+    if (eligibleCount % 2 !== 0) {
+      const lastActiveIneligibleUser = await User.findOne({
+        eligibleForCard: false,
+      }).sort({ lastActiveDate: -1 });
+
+      if (lastActiveIneligibleUser) {
+        lastActiveIneligibleUser.eligibleForCard = true;
+        await lastActiveIneligibleUser.save();
+        eligibleCount++;
+      }
     }
 
-    await user.save();
     console.log("已確認可參加抽卡名單");
-    res.json({ eligibleForCard: user.eligibleForCard });
   } catch (e) {
     console.error("Error during checking:", e);
-    res.status(500).json({ message: "Internal server error." });
   }
 };
 
