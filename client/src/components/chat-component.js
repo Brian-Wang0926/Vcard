@@ -14,7 +14,7 @@ function ChatComponent(props) {
   };
 
   return (
-    <div className="max-w-screen-xl mx-auto mt-4">
+    <div className="max-w-screen-xl mx-auto mt-4 pt-14">
       <div className="flex">
         {/* 好友列表 */}
         <div className="w-1/4 border border-gray-300">

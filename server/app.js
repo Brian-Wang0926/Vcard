@@ -14,7 +14,8 @@ require("./config/passport")(passport);
 const authRoute = require("./routes/auth-route");
 const cardRoute = require("./routes/card-route");
 const chatRoute = require("./routes/chat-route");
-const profileRoute = require("./routes/profile-route")
+const profileRoute = require("./routes/profile-route");
+const articleRoute = require("./routes/article-route");
 
 mongoose
   .connect("mongodb://localhost:27017/Vcard")
@@ -62,6 +63,7 @@ app.use("/api/auth", authRoute);
 app.use("/api/card", cardRoute);
 app.use("/api/chat", chatRoute);
 app.use("/api/profile", profileRoute);
+app.use("/api/article", articleRoute);
 
 // 週作業，暫時放這
 // app.get("/api/getAllPosts", (req, res) => {

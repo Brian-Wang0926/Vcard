@@ -55,7 +55,7 @@ const CardComponent = (props) => {
   }, [userId]);
 
   return (
-    <div className="max-w-screen-xl mx-auto mt-4">
+    <div className="max-w-screen-xl mx-auto mt-4 pt-14">
       {pairedUser ? (
         <div className="flex flex-col items-center">
           <h1 className="text-center my-2">{pairedUser.name}</h1>

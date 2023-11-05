@@ -23,7 +23,7 @@ const ProfileComponent = ({ currentUser }) => {
   }, [currentUser]);
 
   return (
-    <div className="p-12">
+    <div className="p-20">
       {!currentUser && <div>在獲取您的個人資料之前，您必須先登錄。</div>}
 
       {userProfile ? (
