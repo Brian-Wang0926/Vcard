@@ -7,7 +7,7 @@ import LoginComponent from "./components/login-component";
 import ProfileComponent from "./components/profile-component";
 import CardComponent from "./components/card-component";
 import ChatComponent from "./components/chat-component";
-
+import PostComponent from "./components/post-component";
 function App() {
   let [currentUser, setCurrentUser] = useState(AuthService.getCurrentUser());
   return (
@@ -59,6 +59,15 @@ function App() {
             path="chat"
             element={
               <ChatComponent
+                currentUser={currentUser}
+                setCurrentUser={setCurrentUser}
+              />
+            }
+          />
+          <Route
+            path="post"
+            element={
+              <PostComponent
                 currentUser={currentUser}
                 setCurrentUser={setCurrentUser}
               />

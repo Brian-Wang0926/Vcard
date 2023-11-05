@@ -18,7 +18,7 @@ const NavComponent = ({ currentUser, setCurrentUser }) => {
       <nav className="bg-blue-500 p-4 fixed top-0 left-0 right-0 z-10">
         <div className="mx-auto max-w-screen-xl px-4">
           <div className="flex justify-between items-center">
-            <a href="/" className="mr-4 ">
+            <a href="/" className="mr-4 text-white text-lg font-bold tracking-widest">
               Vcard
               {/* <img
                 src="/path-to-your-logo.png"
