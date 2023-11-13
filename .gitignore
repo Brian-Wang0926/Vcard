@@ -1,10 +1,11 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
 # 忽略.env文件
-.env
+client/.env
+server/.env
 
 # 忽略node_modules目录（通常前端和后端都有）
-node_modules/
+**node_modules/
 
 # 忽略构建目录（如果前端和后端都有）
 build/
