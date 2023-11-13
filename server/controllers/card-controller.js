@@ -124,8 +124,8 @@ const pairUsers = async (req, res) => {
     // Batch insert and batch update
     await Card.insertMany(newCards);
     await Promise.all(updateUserPromises);
-    console.log("已完成配對");
-    res.json({ message: "Pairing completed.", pairs: pairedResults });
+    console.log("已完成配對", newCards);
+    // res.json({ message: "Pairing completed.", pairs: pairedResults });
   } catch (e) {
     console.error("Error during pairing:", e);
     res.status(500).json({ message: "Internal server error." });

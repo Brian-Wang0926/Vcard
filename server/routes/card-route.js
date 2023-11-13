@@ -17,9 +17,9 @@ cron.schedule("59 23 * * *", () => {
 });
 
 //先根據每個人的最後登入時間，找出低於三天的獲得抽卡資格
-router.get("/checkEligibility", cardController.checkEligibility);
-// 找出所有有資格抽卡的，進行抽卡
-router.get("/pairUsers", cardController.pairUsers);
+// router.get("/checkEligibility", cardController.checkEligibility);
+// // 找出所有有資格抽卡的，進行抽卡
+// router.get("/pairUsers", cardController.pairUsers);
 
 router.get("/getPairs", authMiddleware, cardController.getPairs);
 

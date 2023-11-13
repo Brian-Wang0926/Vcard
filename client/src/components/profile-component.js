@@ -1,8 +1,14 @@
 import React, { useState, useEffect } from "react";
 import authServiceInstance from "../services/auth-service";
+import moment from "moment-timezone";
 
 const ProfileComponent = ({ currentUser }) => {
   const [userProfile, setUserProfile] = useState(null);
+
+  // 使用 moment-timezone 轉換時間為 UTC+8
+  const formatAsUTC8 = (dateString) => {
+    return moment(dateString).tz("Asia/Shanghai").format("YYYY-MM-DD HH:mm:ss");
+  };
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -44,7 +50,7 @@ const ProfileComponent = ({ currentUser }) => {
               <tr className="border-t">
                 <td className="py-2">
                   <strong className="font-semibold">
-                    姓名：{userProfile.name || "未設定"}
+                    姓名：{userProfile.name}
                   </strong>
                 </td>
               </tr>
@@ -58,7 +64,14 @@ const ProfileComponent = ({ currentUser }) => {
               <tr className="border-t">
                 <td className="py-2">
                   <strong className="font-semibold">
-                    電子信箱: {userProfile.email|| '未設定'}
+                    電子信箱: {userProfile.email}
+                  </strong>
+                </td>
+              </tr>
+              <tr className="border-t">
+                <td className="py-2">
+                  <strong className="font-semibold">
+                    上次登入: {formatAsUTC8(userProfile.lastActiveDate)}
                   </strong>
                 </td>
               </tr>

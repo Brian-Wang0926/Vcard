@@ -4,7 +4,7 @@ import AuthService from "../services/auth-service";
 import BoardListComponent from "./boardList-component";
 import ArticleListComponent from "./articleList-component";
 
-function HomeComponent({ currentUser, setCurrentUser }) {
+function HomeComponent({ currentUser, setCurrentUser, boards, setBoards }) {
   const [searchParams] = useSearchParams();
   const [selectedBoard, setSelectedBoard] = useState(null); // null 表示所有文章
 
@@ -25,7 +25,11 @@ function HomeComponent({ currentUser, setCurrentUser }) {
     <div className=" bg-blue-900 min-h-screen pt-14 overflow-hidden">
       <div className="flex mx-auto max-w-screen-xl">
         <div className="flex-none w-1/4 mr-5">
-          <BoardListComponent setSelectedBoard={setSelectedBoard} />
+          <BoardListComponent
+            boards={boards}
+            setBoards={setBoards}
+            setSelectedBoard={setSelectedBoard}
+          />
         </div>
         <div className="flex-grow">
           <ArticleListComponent board={selectedBoard} />

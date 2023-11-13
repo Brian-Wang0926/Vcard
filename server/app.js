@@ -26,7 +26,7 @@ mongoose
     console.log(e);
   });
 
-// 建立資料庫連結
+// 建立資料庫 rds 連結
 // const db = mysql.createConnection({
 //   host: process.env.YOUR_RDS_ENDPOINT,
 //   user: process.env.YOUR_DB_USERNAME,
@@ -34,7 +34,7 @@ mongoose
 //   database: process.env.YOUR_DB_NAME,
 // });
 
-// 連接資料庫
+// 連接資料庫 rds
 // db.connect((err) => {
 //   if (err) {
 //     console.error("Error connecting to the database:", err.stack);

@@ -30,6 +30,7 @@ const CardComponent = (props) => {
 
   useEffect(() => {
     async function fetchPair() {
+      setPairedUser(null);
       try {
         const headers = authServiceInstance.authHeader();
         const response = await axios.get(`/api/card/getPairs`, { headers });

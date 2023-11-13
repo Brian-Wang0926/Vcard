@@ -1,30 +1,14 @@
-import React, { useEffect, useState } from "react";
-import axios from "axios";
+import React from "react";
 
-const BoardListComponent = ({ setSelectedBoard }) => {
-  const [boards, setBoards] = useState([]);
-  const [loading, setLoading] = useState(true);
+const BoardListComponent = ({ boards, setSelectedBoard }) => {
 
-  useEffect(() => {
-    const fetchBoards = async () => {
-      try {
-        const response = await axios.get("/api/article/boards");
-        setBoards(response.data);
-      } catch (error) {
-        console.error("Error fetching users:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchBoards();
-  }, []);
-
-  if (loading) {
-    return <div>Loading...</div>;
-  }
   const handleBoardClick = (board) => {
     setSelectedBoard(board);
   };
+
+  if (!boards.length) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <div className="bg-blue-900 rounded-lg p-4 my-2 text-white">

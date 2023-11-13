@@ -19,9 +19,9 @@ passport.use(
         console.log("使用者已經註冊過了，無需存入資料庫");
         // 更新"最近登入時間"
         existingUser.lastActiveDate = new Date();
+        console.log("現在時間：", Date());
         await existingUser.save();
         return done(null, existingUser);
-
       } else {
         console.log("偵測到新用戶，需存入資料庫");
         const newUser = new User({
