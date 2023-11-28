@@ -5,4 +5,8 @@ const { authMiddleware } = require("../controllers/auth-controller");
 
 router.get("/", authMiddleware, profileController.getUserProfile);
 
+router.put("/save-article", authMiddleware, profileController.saveArticle);
+
+router.get("/save-article", authMiddleware, profileController.getSaveArticle);
+
 module.exports = router;

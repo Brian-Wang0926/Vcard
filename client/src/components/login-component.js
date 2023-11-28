@@ -10,7 +10,7 @@ const LoginComponent = () => {
     // 获取用户列表的函数
     const fetchUsers = async () => {
       try {
-        const response = await axios.get("/api/auth/mock-users"); // 假设你有一个API端点来获取用户列表
+        const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/auth/mock-users`); // 假设你有一个API端点来获取用户列表
         setUsers(response.data); // 假设响应的数据是一个用户数组
       } catch (error) {
         console.error("Error fetching users:", error);

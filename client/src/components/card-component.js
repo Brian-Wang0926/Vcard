@@ -10,11 +10,10 @@ const CardComponent = (props) => {
 
   const handleSendInvite = async () => {
     try {
-      const headers = authServiceInstance.authHeader();
       const response = await axios.post(
-        "/api/card/accept",
+        `${process.env.REACT_APP_API_URL}/api/card/accept`,
         { cardId, userId },
-        { headers }
+        { headers: authServiceInstance.authHeader() }
       );
 
       if (response.status === 200) {
@@ -32,8 +31,10 @@ const CardComponent = (props) => {
     async function fetchPair() {
       setPairedUser(null);
       try {
-        const headers = authServiceInstance.authHeader();
-        const response = await axios.get(`/api/card/getPairs`, { headers });
+        const response = await axios.get(
+          `${process.env.REACT_APP_API_URL}/api/card/getPairs`,
+          { headers:authServiceInstance.authHeader() }
+        );
         const cards = response.data;
         const card = cards.find(
           (card) => card.userID1._id === userId || card.userID2._id === userId

@@ -11,7 +11,7 @@ const BoardListComponent = ({ boards, setSelectedBoard }) => {
   }
 
   return (
-    <div className="bg-blue-900 rounded-lg p-4 my-2 text-white">
+    <div className="bg-gray-800 rounded-lg p-4 my-2 text-white">
       <h1 className="mb-4">看板列表</h1>
       {boards.map((board) => (
         <div

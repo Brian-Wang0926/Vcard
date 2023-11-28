@@ -7,7 +7,7 @@ const googleCallback = (req, res) => {
   const token = jwt.sign(tokenObj, process.env.JWT_SECRET);
 
   res.redirect(
-    `http://localhost:3000?token=JWT ${token}&name=${user.name}&id=${user.id}`
+    `${process.env.APP_URI}?token=JWT ${token}&name=${user.name}&id=${user.id}`
   );
 };
 

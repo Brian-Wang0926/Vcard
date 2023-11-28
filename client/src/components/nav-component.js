@@ -1,6 +1,10 @@
 import React from "react";
 import { NavLink } from "react-router-dom";
 import AuthService from "../services/auth-service";
+import PenIcon from "../icons/8664843_pen_to_square_icon.svg";
+import CardIcon from "../icons/8664908_window_restore_application_icon.svg";
+import ChatIcon from "../icons/8664935_message_chat_communication_icon.svg";
+import ProfileIcon from "../icons/8664831_user_icon.svg";
 
 const NavComponent = ({ currentUser, setCurrentUser }) => {
   const handleLogout = () => {
@@ -10,53 +14,51 @@ const NavComponent = ({ currentUser, setCurrentUser }) => {
   };
 
   const getNavLinkClass = ({ isActive }) => {
-    return isActive ? "text-black" : "text-white hover:text-gray-300";
+    return isActive ? "text-black" : "text-gray-400 hover:text-gray-700";
   };
 
   return (
     <div>
-      <nav className="bg-blue-500 p-4 fixed top-0 left-0 right-0 z-10">
+      <nav className="bg-gray-300 fixed top-0 left-0 right-0 z-10">
         <div className="mx-auto max-w-screen-xl px-4">
           <div className="flex justify-between items-center">
-            <a href="/" className="mr-4 text-white text-lg font-bold tracking-widest">
+            <a
+              href="/"
+              className="p-2 text-black font-bold tracking-widest text-3xl"
+            >
               Vcard
-              {/* <img
-                src="/path-to-your-logo.png"
-                alt="Logo"
-                className="h-8 w-auto"
-              />{" "} */}
             </a>
-            <ul className="flex space-x-4 ml-auto">
-              <li className="nav-item">
+            <ul className="flex space-x-4">
+              {/* <li className="nav-item">
                 <NavLink className={getNavLinkClass} to="/">
                   首頁
                 </NavLink>
-              </li>
+              </li> */}
               {currentUser && (
                 <li className="nav-item">
                   <NavLink className={getNavLinkClass} to="/post">
-                    寫文章
+                    <img src={PenIcon} className="w-6 h-6 m-2" alt="寫文章" />
                   </NavLink>
                 </li>
               )}
               {currentUser && (
                 <li className="nav-item">
                   <NavLink className={getNavLinkClass} to="/card">
-                    抽卡
+                    <img src={CardIcon} className="w-6 h-6 m-2" alt="抽卡" />
                   </NavLink>
                 </li>
               )}
               {currentUser && (
                 <li className="nav-item">
                   <NavLink className={getNavLinkClass} to="/chat">
-                    聊天
+                    <img src={ChatIcon} className="w-6 h-6 m-2" alt="聊天" />
                   </NavLink>
                 </li>
               )}
               {currentUser && (
                 <li className="nav-item">
                   <NavLink className={getNavLinkClass} to="/profile">
-                    個人頁面
+                    <img src={ProfileIcon} className="w-6 h-6 m-2" alt="個人" />
                   </NavLink>
                 </li>
               )}
@@ -68,12 +70,8 @@ const NavComponent = ({ currentUser, setCurrentUser }) => {
                 </li>
               )}
               {currentUser && (
-                <li className="nav-item">
-                  <NavLink
-                    onClick={handleLogout}
-                    className="text-white"
-                    to="/login"
-                  >
+                <li className="nav-item flex items-center">
+                  <NavLink onClick={handleLogout} to="/login">
                     登出
                   </NavLink>
                 </li>

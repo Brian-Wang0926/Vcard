@@ -21,6 +21,12 @@ const userSchema = new Schema({
     type: String,
     default: "https://cdn3.iconfinder.com/data/icons/feather-5/24/user-512.png",
   },
+  savedArticles: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Article",
+    },
+  ],
   date: {
     type: Date,
     default: Date.now,

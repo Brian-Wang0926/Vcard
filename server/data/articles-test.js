@@ -1,9 +1,11 @@
 const mongoose = require("mongoose");
+const mongooseUri =
+  process.env.MONGODB_URI || "mongodb://localhost:27017/Vcard";
 const Article = require("../models/article-model");
 const Board = require("../models/board-model");
 
 mongoose
-  .connect("mongodb://localhost:27017/Vcard", {
+  .connect(mongooseUri, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
   })

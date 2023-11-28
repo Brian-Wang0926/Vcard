@@ -1,0 +1,11 @@
+<svg width="23.999999999999996" height="23.999999999999996" xmlns="http://www.w3.org/2000/svg" class="feather feather-heart">
+
+ <g>
+  <title>background</title>
+  <rect fill="none" id="canvas_background" height="402" width="582" y="-1" x="-1"/>
+ </g>
+ <g>
+  <title>Layer 1</title>
+  <path fill="#ff0000" id="svg_1" d="m20.84,4.568904a5.5,5.5 0 0 0 -7.78,0l-1.06,1.06l-1.06,-1.06a5.5,5.5 0 0 0 -7.78,7.78l1.06,1.06l7.78,7.78l7.78,-7.78l1.06,-1.06a5.5,5.5 0 0 0 0,-7.78z"/>
+ </g>
+</svg>

@@ -9,7 +9,7 @@ passport.use(
     {
       clientID: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-      callbackURL: "/api/auth/google/callback",
+      callbackURL: `${process.env.APP_URI}/api/auth/google/callback`,
     },
     async (accessToken, refreshToken, profile, done) => {
       console.log("進入 google strategy 的區域");

@@ -37,7 +37,7 @@ const checkEligibility = async (req, res) => {
 
     await User.bulkWrite(bulkUpdateOperations);
 
-    // 如果 eligibleForCard = true 的用户数量是奇数，找出一个未获得资格但最近活跃的用户，给予抽卡资格
+    // 如果有資格抽卡的人數是奇數，找出一個未獲得資格但最近活躍得用戶，给予抽卡資格
     if (eligibleCount % 2 !== 0) {
       const lastActiveIneligibleUser = await User.findOne({
         eligibleForCard: false,
@@ -63,12 +63,9 @@ const pairUsers = async (req, res) => {
       { eligibleForCard: true },
       "_id cardsDrawn"
     );
-    const pairedResults = []; //保存已配對用戶的結果
     const newCards = []; //保存新建的卡片，每一張卡片代表一組配對
     const updateUserPromises = []; //保存所有更新用戶資訊的異步操作
-
-    // Set to keep track of paired users
-    const pairedUsersSet = new Set();
+    const pairedUsersSet = new Set(); //一個集合(set)，用來追蹤已經配對的用戶
 
     for (let i = 0; i < eligibleUsers.length; i++) {
       let userA = eligibleUsers[i];
@@ -89,16 +86,10 @@ const pairUsers = async (req, res) => {
         newCards.push({
           userID1: userA._id,
           userID2: userB._id,
-          // date: new Date(),
         });
 
         userA.cardsDrawn.push(userB._id);
         userB.cardsDrawn.push(userA._id);
-
-        pairedResults.push({
-          user1: userA._id,
-          user2: userB._id,
-        });
 
         // Update user data
         updateUserPromises.push(
@@ -125,7 +116,7 @@ const pairUsers = async (req, res) => {
     await Card.insertMany(newCards);
     await Promise.all(updateUserPromises);
     console.log("已完成配對", newCards);
-    // res.json({ message: "Pairing completed.", pairs: pairedResults });
+
   } catch (e) {
     console.error("Error during pairing:", e);
     res.status(500).json({ message: "Internal server error." });

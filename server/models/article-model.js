@@ -21,7 +21,13 @@ const articleSchema = new Schema(
       ref: "Board",
       required: true,
     },
-    mediaUrls: [String],
+    likes: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+      },
+    ],
+    commentCount: { type: Number, default: 0 }
   },
   { timestamps: true }
 );

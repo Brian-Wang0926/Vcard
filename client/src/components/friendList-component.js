@@ -9,7 +9,7 @@ function FriendListComponent(props) {
     async function fetchFriends() {
       try {
         const headers = authServiceInstance.authHeader();
-        const response = await axios.get(`api/chat/friends`, { headers });
+        const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/chat/friends`, { headers });
 
         setFriends(response.data);
       } catch (error) {

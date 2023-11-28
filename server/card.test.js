@@ -6,14 +6,16 @@ const app = require("./app");
 const User = require("./models/user-model");
 const Card = require("./models/card-model");
 const mongoose = require("mongoose");
+const mongooseUri =
+  process.env.MONGODB_URI || "mongodb://localhost:27017/Vcard";
 const { performance } = require("perf_hooks");
 let server;
 
 describe("Card Pairing", () => {
   // 在所有測試開始前，建立數據庫連接
   beforeAll(async () => {
-    // 這邊可以考慮連接測試用的數據庫，以避免干擾生產環境的數據
-    await mongoose.connect("mongodb://localhost:27017/Vcard", {
+
+    await mongoose.connect(mongooseUri, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
     });
@@ -76,7 +78,7 @@ describe("Card Pairing", () => {
   afterAll(async () => {
     // await User.deleteMany({});
     // await Card.deleteMany({});
-    await new Promise(resolve => server.close(resolve)); // 修改這裡，使用Promise確保server已經完全關閉
+    await new Promise((resolve) => server.close(resolve)); // 修改這裡，使用Promise確保server已經完全關閉
     await mongoose.connection.close();
     // console.log("檢查打開的句柄...");
     // logOpenHandles();

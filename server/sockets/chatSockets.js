@@ -2,7 +2,7 @@ const Chat = require("../models/chat-model");
 
 module.exports = function (io) {
   io.on("connection", (socket) => {
-    // console.log("使用者成功連結");
+    console.log("使用者成功連結");
 
     io.to("someUserId").emit("new_message", {
       fromUserId: "testServerId",

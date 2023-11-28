@@ -27,10 +27,12 @@ const ChatRoomComponent = (props) => {
     async function fetchChatHistory() {
       if (props.otherUserId) {
         try {
-          const headers = authServiceInstance.authHeader();
-          const response = await axios.get(`api/chat/${props.otherUserId}`, {
-            headers,
-          });
+          const response = await axios.get(
+            `${process.env.REACT_APP_API_URL}/api/chat/${props.otherUserId}`,
+            {
+              headers: authServiceInstance.authHeader(),
+            }
+          );
           setChat(response.data);
         } catch (error) {
           console.error("Failed to fetch chat history:", error);

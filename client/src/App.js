@@ -17,7 +17,9 @@ function App() {
   useEffect(() => {
     const fetchBoards = async () => {
       try {
-        const response = await axios.get("/api/article/boards");
+        const response = await axios.get(
+          `${process.env.REACT_APP_API_URL}/api/article/boards`
+        );
         setBoards(response.data);
       } catch (error) {
         console.error("Error fetching boards:", error);

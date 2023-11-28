@@ -1,5 +1,4 @@
 import axios from "axios";
-const API_URL = process.env.REACT_APP_API_URL;
 
 class AuthService {
   authHeader() {
@@ -10,14 +9,6 @@ class AuthService {
       return {};
     }
   }
-
-  // async login(userData) {
-  //   const response = await axios.post(API_URL + "/api/auth/login", userData);
-  //   if (response.data) {
-  //     localStorage.setItem("user", JSON.stringify(response.data));
-  //     return response.data;
-  //   }
-  // }
 
   logout() {
     localStorage.removeItem("user");
@@ -30,13 +21,16 @@ class AuthService {
   }
 
   getUserProfile() {
-    const headers = this.authHeader();
-    if (!headers.Authorization) return null;
-    return axios.get(API_URL + "/api/profile", { headers });
+    return axios.get(`${process.env.REACT_APP_API_URL}/api/profile`, {
+      headers: authServiceInstance.authHeader(),
+    });
   }
 
   async mockLogin(userData) {
-    return axios.post(API_URL + "/api/auth/mock", userData);
+    return axios.post(
+      `${process.env.REACT_APP_API_URL}/api/auth/mock`,
+      userData
+    );
   }
 }
 
