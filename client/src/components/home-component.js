@@ -10,10 +10,10 @@ function HomeComponent({ currentUser, setCurrentUser, boards, setBoards }) {
 
   useEffect(() => {
     const token = searchParams.get("token");
-    const name = searchParams.get("name");
-    const id = searchParams.get("id");
-    // 如果 token 存在，儲存到 localStorage
+
     if (token) {
+      const name = searchParams.get("name");
+      const id = searchParams.get("id");
       const Obj = { token: token, name, id };
       localStorage.setItem("user", JSON.stringify(Obj));
       console.log("已將token存進localStorage");
