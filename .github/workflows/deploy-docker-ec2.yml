@@ -41,7 +41,7 @@ jobs:
       - name: Build and push frontend Docker image
         run: |
           docker buildx build \
-            --platform linux/amd64,linux/arm64 \
+            --platform linux/amd64 \
             --build-arg REACT_APP_API_URL=${{ secrets.REACT_APP_API_URL }} \
             --build-arg REACT_APP_MOCK_ENV=${{ secrets.REACT_APP_MOCK_ENV }} \
             --build-arg REACT_APP_CLOUDFRONT_URL=${{ secrets.REACT_APP_CLOUDFRONT_URL }} \
@@ -50,7 +50,7 @@ jobs:
 
       - name: Build and push backend Docker image
         run: |
-          docker buildx build --platform linux/amd64,linux/arm64 -t boyuan0926/backend:latest --push -f server/Dockerfile server
+          docker buildx build --platform linux/amd64 -t boyuan0926/backend:latest --push -f server/Dockerfile server
 
   deploy:
     needs: build-and-push
