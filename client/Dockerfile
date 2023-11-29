@@ -1,5 +1,10 @@
 FROM node:18 AS build
 
+# 声明需要的环境变量
+ARG REACT_APP_API_URL
+ARG REACT_APP_MOCK_ENV
+ARG REACT_APP_CLOUDFRONT_URL
+
 WORKDIR /usr/src/app
 
 COPY package*.json ./
@@ -8,6 +13,12 @@ COPY package-lock.json ./
 RUN npm install
 
 COPY . .
+
+# 设置环境变量
+ENV REACT_APP_API_URL $REACT_APP_API_URL
+ENV REACT_APP_MOCK_ENV $REACT_APP_MOCK_ENV
+ENV REACT_APP_CLOUDFRONT_URL $REACT_APP_CLOUDFRONT_URL
+
 
 RUN npm run build
 # /usr/src/app/build
