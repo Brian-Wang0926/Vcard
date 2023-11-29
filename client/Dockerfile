@@ -4,7 +4,7 @@ WORKDIR /usr/src/app
 COPY package*.json ./
 
 # 使用 npm ci 代替 npm install，并仅安装生产依赖项
-RUN npm ci --only=production
+RUN npm ci
 
 # 声明需要的环境变量
 ARG REACT_APP_API_URL
