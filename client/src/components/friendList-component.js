@@ -9,7 +9,10 @@ function FriendListComponent(props) {
     async function fetchFriends() {
       try {
         const headers = authServiceInstance.authHeader();
-        const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/chat/friends`, { headers });
+        const response = await axios.get(
+          `${process.env.REACT_APP_API_URL}/api/chat/friends`,
+          { headers }
+        );
 
         setFriends(response.data);
       } catch (error) {
@@ -40,13 +43,15 @@ function FriendListComponent(props) {
 
   return (
     <div className="m-2">
-      <h3>好友列表</h3>
-      <ul className="space-y-4 m-2">
+      <h3 className="m-2">好友列表</h3>
+      <ul>
         {friends.map((friend) => (
           <li
             key={friend._id}
             className={`cursor-pointer flex items-center space-x-4 p-2 rounded ${
-              friend._id === props.selectedFriendId ? "bg-gray-400" : ""
+              friend._id === props.selectedFriendId
+                ? "bg-gray-400"
+                : " hover:bg-gray-200"
             }`}
             onClick={() =>
               handleFriendClick(friend._id, friend.name, friend.thumbnail)

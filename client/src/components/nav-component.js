@@ -19,9 +19,9 @@ const NavComponent = ({ currentUser, setCurrentUser }) => {
 
   return (
     <div>
-      <nav className="bg-gray-300 fixed top-0 left-0 right-0 z-10">
-        <div className="mx-auto max-w-screen-xl px-4">
-          <div className="flex justify-between items-center">
+      <nav className="bg-gray-300 fixed top-0 left-0 right-0 z-10" style={{ height: '56px' }}>
+        <div className="mx-auto max-w-screen-xl px-4 h-full">
+          <div className="flex justify-between items-center h-full">
             <a
               href="/"
               className="p-2 text-black font-bold tracking-widest text-3xl"

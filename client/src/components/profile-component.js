@@ -81,7 +81,7 @@ const ProfileComponent = ({ currentUser, setCurrentUser }) => {
   const renderProfileSection = () => {
     if (userProfile) {
       return (
-        <>
+        <div className="m-4">
           <div className="text-xl font-bold mb-4">個人檔案：</div>
           <table className="min-w-full table-auto border-collapse">
             <tbody>
@@ -124,7 +124,7 @@ const ProfileComponent = ({ currentUser, setCurrentUser }) => {
               </tr>
             </tbody>
           </table>
-        </>
+        </div>
       );
     }
     return <div>Loading...</div>;
@@ -154,7 +154,7 @@ const ProfileComponent = ({ currentUser, setCurrentUser }) => {
 
 
   return (
-    <div className="flex pt-14 max-w-screen-xl mx-auto">
+    <div className="flex pt-14 max-w-screen-xl mx-auto overflow-hidden h-screen">
       <aside className="w-1/4 bg-gray-100">
         <ul className="space-y-2">
           <li
@@ -183,7 +183,7 @@ const ProfileComponent = ({ currentUser, setCurrentUser }) => {
           </li>
         </ul>
       </aside>
-      <main className="w-3/4 p-4">{renderContent()}</main>
+      <main className="w-3/4 overflow-hidden">{renderContent()}</main>
     </div>
   );
 };

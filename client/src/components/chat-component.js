@@ -14,10 +14,10 @@ function ChatComponent(props) {
   };
 
   return (
-    <div className="max-w-screen-xl mx-auto mt-4 pt-14">
-      <div className="flex">
+    <div className="max-w-screen-xl mx-auto pt-20 pb-14 h-screen overflow-hidden">
+      <div className="flex h-full">
         {/* 好友列表 */}
-        <div className="w-1/4 border border-gray-300">
+        <div className="w-1/4 border border-gray-300 h-full overflow-y-auto">
           <FriendListComponent
             currentUser={props.currentUser}
             onSelectFriend={handleSelectFriend}
@@ -25,7 +25,7 @@ function ChatComponent(props) {
           />
         </div>
         {/* 聊天室 */}
-        <div className="w-3/4 border border-gray-300">
+        <div className="w-3/4 border border-gray-300 h-full">
           <ChatRoomComponent
             currentUser={props.currentUser}
             otherUserId={selectedFriendId}

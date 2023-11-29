@@ -40,7 +40,7 @@ const mockLogin = async (req, res) => {
 
 const getAllMockUsers = async (req, res) => {
   try {
-    const users = await User.find({}); // 獲取所有用戶
+    const users = await User.find({ name: /^Test User / }); // 獲取所有用戶
     res.json(users); // 發送響應
   } catch (error) {
     res.status(500).json({ message: "伺服器錯誤" });

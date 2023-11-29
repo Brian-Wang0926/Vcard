@@ -80,11 +80,13 @@ const ChatRoomComponent = (props) => {
   };
 
   return (
-    <div className="m-2">
-      <h3>id：{props.otherUserId}</h3>
-      <h3>姓名：{props.otherUserName}</h3>
-      <br></br>
-      <div className="max-h-96 overflow-y-auto" ref={chatContainerRef}>
+    <div className="flex flex-col h-full">
+      {/* 好友資訊 */}
+      <div className="flex-none p-2">
+        <div className="text-lg leading-6 font-medium text-gray-900">{props.otherUserName}</div>
+      </div>
+      {/* 顯示區 */}
+      <div className="flex-1 overflow-y-auto p-2 bg-gray-100" ref={chatContainerRef}>
         {chat.map((msg, index) => (
           <div
             key={index}
@@ -109,7 +111,7 @@ const ChatRoomComponent = (props) => {
               className={`m-2 p-2 rounded inline-block ${
                 msg.fromUserId === props.currentUser.id
                   ? "bg-green-200"
-                  : "bg-gray-200"
+                  : "bg-blue-200"
               }`}
             >
               {msg.message}
@@ -117,21 +119,22 @@ const ChatRoomComponent = (props) => {
           </div>
         ))}
       </div>
-
-      <br></br>
-      <div className="flex">
-        <input
-          value={message}
-          onChange={(e) => setMessage(e.target.value)}
-          onKeyPress={handleKeyPress}
-          className="w-full border border-gray-300 rounded px-4 py-2 mr-2"
-        />
-        <button
-          onClick={sendMessage}
-          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded "
-        >
-          Send
-        </button>
+      {/* 輸入區 */}
+      <div className="flex-none p-2">
+        <div className="flex items-center">
+          <input
+            value={message}
+            onChange={(e) => setMessage(e.target.value)}
+            onKeyPress={handleKeyPress}
+            className="w-full border border-gray-300 rounded px-4 py-2 mr-2 "
+          />
+          <button
+            onClick={sendMessage}
+            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded "
+          >
+            Send
+          </button>
+        </div>
       </div>
     </div>
   );
