@@ -9,7 +9,6 @@
     "@testing-library/user-event": "^13.5.0",
     "axios": "^1.6.0",
     "draft-js": "^0.11.7",
-    "easymde": "^2.18.0",
     "highlight.js": "^11.9.0",
     "markdown-it": "^13.0.2",
     "marked": "^9.1.5",
@@ -30,7 +29,8 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "analyze": "source-map-explorer build/static/js/*.js"
   },
   "eslintConfig": {
     "extends": [

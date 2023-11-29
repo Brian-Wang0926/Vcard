@@ -13,21 +13,31 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v2
 
-      - name: Cache Frontend node modules
+      - name: Cache Node.js modules
         uses: actions/cache@v2
         with:
-          path: client/node_modules
-          key: ${{ runner.os }}-frontend-node-${{ hashFiles('client/package-lock.json') }}
+          path: |
+            client/node_modules
+            server/node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
           restore-keys: |
-            ${{ runner.os }}-frontend-node-
+            ${{ runner.os }}-node-
 
-      - name: Cache Backend node modules
-        uses: actions/cache@v2
-        with:
-          path: server/node_modules
-          key: ${{ runner.os }}-backend-node-${{ hashFiles('server/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-backend-node-
+      # - name: Cache Frontend node modules
+      #   uses: actions/cache@v2
+      #   with:
+      #     path: client/node_modules
+      #     key: ${{ runner.os }}-frontend-node-${{ hashFiles('client/package-lock.json') }}
+      #     restore-keys: |
+      #       ${{ runner.os }}-frontend-node-
+
+      # - name: Cache Backend node modules
+      #   uses: actions/cache@v2
+      #   with:
+      #     path: server/node_modules
+      #     key: ${{ runner.os }}-backend-node-${{ hashFiles('server/package-lock.json') }}
+      #     restore-keys: |
+      #       ${{ runner.os }}-backend-node-
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1
