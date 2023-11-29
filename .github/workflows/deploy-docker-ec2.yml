@@ -13,31 +13,21 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v2
 
-      - name: Cache Node.js modules
+      - name: Cache Frontend node modules
         uses: actions/cache@v2
         with:
-          path: |
-            client/node_modules
-            server/node_modules
-          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          path: client/node_modules
+          key: ${{ runner.os }}-frontend-node-${{ hashFiles('client/package-lock.json') }}
           restore-keys: |
-            ${{ runner.os }}-node-
+            ${{ runner.os }}-frontend-node-
 
-      # - name: Cache Frontend node modules
-      #   uses: actions/cache@v2
-      #   with:
-      #     path: client/node_modules
-      #     key: ${{ runner.os }}-frontend-node-${{ hashFiles('client/package-lock.json') }}
-      #     restore-keys: |
-      #       ${{ runner.os }}-frontend-node-
-
-      # - name: Cache Backend node modules
-      #   uses: actions/cache@v2
-      #   with:
-      #     path: server/node_modules
-      #     key: ${{ runner.os }}-backend-node-${{ hashFiles('server/package-lock.json') }}
-      #     restore-keys: |
-      #       ${{ runner.os }}-backend-node-
+      - name: Cache Backend node modules
+        uses: actions/cache@v2
+        with:
+          path: server/node_modules
+          key: ${{ runner.os }}-backend-node-${{ hashFiles('server/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-backend-node-
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1
@@ -73,6 +63,4 @@ jobs:
           username: ec2-user
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            docker-compose down
-            docker-compose pull
-            docker-compose up -d
+            docker-compose up -d --build --remove-orphans
