@@ -63,4 +63,5 @@ jobs:
           username: ec2-user
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
+            docker-compose pull
             docker-compose up -d --build --remove-orphans
