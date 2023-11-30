@@ -1,22 +1,27 @@
 import React, { useState, useEffect } from "react";
 import authServiceInstance from "../services/auth-service";
 import axios from "axios";
+import useUserStore from "../stores/userStore";
+import { useNavigate } from "react-router-dom";
 
 const LoginComponent = () => {
   const [selectedUserId, setSelectedUserId] = useState("");
-  const [users, setUsers] = useState([]);
+  const [mockUsers, setMockUsers] = useState([]);
+  const { setCurrentUser } = useUserStore();
+  const navigate = useNavigate();
 
   useEffect(() => {
     // 获取用户列表的函数
     const fetchUsers = async () => {
       try {
-        const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/auth/mock-users`); // 假设你有一个API端点来获取用户列表
-        setUsers(response.data); // 假设响应的数据是一个用户数组
+        const response = await axios.get(
+          `${process.env.REACT_APP_API_URL}/api/auth/mock-users`
+        ); // 假设你有一个API端点来获取用户列表
+        setMockUsers(response.data); // 假设响应的数据是一个用户数组
       } catch (error) {
         console.error("Error fetching users:", error);
       }
     };
-
     fetchUsers();
   }, []);
 
@@ -27,7 +32,9 @@ const LoginComponent = () => {
       });
       if (response.data && response.data.token) {
         localStorage.setItem("user", JSON.stringify(response.data));
-        window.location.href = "/profile";
+        setCurrentUser(response.data);
+        console.log("模擬登入成功", response.data);
+        navigate("/profile");
       }
     } catch (error) {
       console.error("模擬登入失敗:", error);
@@ -56,15 +63,11 @@ const LoginComponent = () => {
             <option value="" disabled>
               Select a mock user
             </option>
-            {users.map(
-              (
-                user 
-              ) => (
-                <option key={user._id} value={user._id}>
-                  {user.name}
-                </option>
-              )
-            )}
+            {mockUsers.map((user) => (
+              <option key={user._id} value={user._id}>
+                {user.name}
+              </option>
+            ))}
           </select>
           <button
             className="bg-blue-500 text-white py-1 px-2 mt-5 rounded-lg"

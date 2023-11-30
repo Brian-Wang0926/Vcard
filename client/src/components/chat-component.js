@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import ChatRoomComponent from "./chatRoom-component";
 import FriendListComponent from "./friendList-component";
 
-function ChatComponent(props) {
+function ChatComponent() {
   const [selectedFriendId, setSelectedFriendId] = useState(null);
   const [selectedFriendName, setSelectedFriendName] = useState(null);
   const [selectedFriendAvatarUrl, setSelectedFriendAvatarUrl] = useState(null);
@@ -19,7 +19,6 @@ function ChatComponent(props) {
         {/* 好友列表 */}
         <div className="w-1/4 border border-gray-300 h-full overflow-y-auto">
           <FriendListComponent
-            currentUser={props.currentUser}
             onSelectFriend={handleSelectFriend}
             selectedFriendId={selectedFriendId}
           />
@@ -27,7 +26,6 @@ function ChatComponent(props) {
         {/* 聊天室 */}
         <div className="w-3/4 border border-gray-300 h-full">
           <ChatRoomComponent
-            currentUser={props.currentUser}
             otherUserId={selectedFriendId}
             otherUserName={selectedFriendName}
             otherUserAvatarUrl={selectedFriendAvatarUrl}

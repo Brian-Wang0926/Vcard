@@ -4,18 +4,18 @@ import axios from "axios";
 import authServiceInstance from "../services/auth-service";
 import ArticleModal from "./article-modal";
 import Article from "./Article";
+import useUserStore from "../stores/userStore";
 
 const ArticleListComponent = ({
   board,
   articles: providedArticles,
-  currentUser,
-  setCurrentUser,
   showOnlySaved = false,
 }) => {
   const [articles, setArticles] = useState(providedArticles || []);
   const [loading, setLoading] = useState(true);
   const [selectedArticle, setSelectedArticle] = useState(null);
   const navigate = useNavigate();
+  const { currentUser, setCurrentUser } = useUserStore();
 
   const fetchArticles = useCallback(async () => {
     setLoading(true);
@@ -23,8 +23,7 @@ const ArticleListComponent = ({
       let response;
       if (showOnlySaved && currentUser && currentUser.savedArticles) {
         response = await axios.get(`${process.env.REACT_APP_API_URL}/api/profile/save-article`, { headers: authServiceInstance.authHeader() });
-        const savedArticleIds = new Set(response.data.savedArticles.map(a => a._id));
-        setArticles(providedArticles.filter(article => savedArticleIds.has(article._id)));
+        setArticles(response.data.savedArticles);
       } else {
         const endpoint = board ? `${process.env.REACT_APP_API_URL}/api/article?board=${board._id}` : `${process.env.REACT_APP_API_URL}/api/article`;
         response = await axios.get(endpoint);

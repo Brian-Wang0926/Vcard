@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import authServiceInstance from "../services/auth-service";
+import useUserStore from "../stores/userStore";
 
 const CardComponent = (props) => {
-  const userId = props.currentUser && props.currentUser.id;
+  const { currentUser } = useUserStore();
+  const userId = currentUser && currentUser.id;
   const [pairedUser, setPairedUser] = useState(null);
   const [cardId, setCardId] = useState(null);
   const [inviteStatus, setInviteStatus] = useState("未發送");
@@ -33,7 +35,7 @@ const CardComponent = (props) => {
       try {
         const response = await axios.get(
           `${process.env.REACT_APP_API_URL}/api/card/getPairs`,
-          { headers:authServiceInstance.authHeader() }
+          { headers: authServiceInstance.authHeader() }
         );
         const cards = response.data;
         const card = cards.find(

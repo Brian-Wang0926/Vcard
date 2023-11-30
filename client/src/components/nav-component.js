@@ -1,16 +1,21 @@
 import React from "react";
-import { NavLink } from "react-router-dom";
+import { useNavigate, NavLink } from "react-router-dom";
 import AuthService from "../services/auth-service";
+import useUserStore from "../stores/userStore";
 import PenIcon from "../icons/8664843_pen_to_square_icon.svg";
 import CardIcon from "../icons/8664908_window_restore_application_icon.svg";
 import ChatIcon from "../icons/8664935_message_chat_communication_icon.svg";
 import ProfileIcon from "../icons/8664831_user_icon.svg";
 
-const NavComponent = ({ currentUser, setCurrentUser }) => {
+const NavComponent = () => {
+  const { currentUser, setCurrentUser } = useUserStore();
+  const navigate = useNavigate();
+
   const handleLogout = () => {
     AuthService.logout(); //清空 Local storage
     window.alert("登出成功，您現在會被導向到首頁");
     setCurrentUser(null);
+    navigate("/");
   };
 
   const getNavLinkClass = ({ isActive }) => {
@@ -19,7 +24,10 @@ const NavComponent = ({ currentUser, setCurrentUser }) => {
 
   return (
     <div>
-      <nav className="bg-gray-300 fixed top-0 left-0 right-0 z-10" style={{ height: '56px' }}>
+      <nav
+        className="bg-gray-300 fixed top-0 left-0 right-0 z-10"
+        style={{ height: "56px" }}
+      >
         <div className="mx-auto max-w-screen-xl px-4 h-full">
           <div className="flex justify-between items-center h-full">
             <a
@@ -29,11 +37,6 @@ const NavComponent = ({ currentUser, setCurrentUser }) => {
               Vcard
             </a>
             <ul className="flex space-x-4">
-              {/* <li className="nav-item">
-                <NavLink className={getNavLinkClass} to="/">
-                  首頁
-                </NavLink>
-              </li> */}
               {currentUser && (
                 <li className="nav-item">
                   <NavLink className={getNavLinkClass} to="/post">

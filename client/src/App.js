@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import AuthService from "./services/auth-service";
+import RequireAuth from "./hoc/requireAuth";
 import Layout from "./components/Layout";
 import HomeComponent from "./components/home-component";
 import LoginComponent from "./components/login-component";
@@ -9,10 +9,20 @@ import ProfileComponent from "./components/profile-component";
 import CardComponent from "./components/card-component";
 import ChatComponent from "./components/chat-component";
 import PostComponent from "./components/post-component";
+import useUserStore from "./stores/userStore";
+import authServiceInstance from "./services/auth-service";
+import RedirectToHome from './components/redirectToHome';
 
 function App() {
-  let [currentUser, setCurrentUser] = useState(AuthService.getCurrentUser());
   const [boards, setBoards] = useState([]); // 新增看板數據的狀態
+  const { setCurrentUser } = useUserStore();
+
+  useEffect(() => {
+    const storedUser = authServiceInstance.getCurrentUser(); // 从 localStorage 获取用户数据
+    if (storedUser) {
+      setCurrentUser(storedUser); // 更新 Zustand store
+    }
+  }, [setCurrentUser]);
 
   useEffect(() => {
     const fetchBoards = async () => {
@@ -31,67 +41,43 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route
-          path="/"
-          element={
-            <Layout currentUser={currentUser} setCurrentUser={setCurrentUser} />
-          }
-        >
+        <Route path="/" element={<Layout />}>
           <Route
             index
-            element={
-              <HomeComponent
-                currentUser={currentUser}
-                setCurrentUser={setCurrentUser}
-                boards={boards}
-                setBoards={setBoards}
-              />
-            }
+            element={<HomeComponent boards={boards} setBoards={setBoards} />}
           />
-          <Route
-            path="login"
-            element={
-              <LoginComponent
-                currentUser={currentUser}
-                setCurrentUser={setCurrentUser}
-              />
-            }
-          />
+          <Route path="login" element={<LoginComponent />} />
+          <Route path="*" element={<RedirectToHome />} />
           <Route
             path="profile"
             element={
-              <ProfileComponent
-                currentUser={currentUser}
-                setCurrentUser={setCurrentUser}
-              />
+              <RequireAuth>
+                <ProfileComponent />
+              </RequireAuth>
             }
           />
           <Route
             path="card"
             element={
-              <CardComponent
-                currentUser={currentUser}
-                setCurrentUser={setCurrentUser}
-              />
+              <RequireAuth>
+                <CardComponent />
+              </RequireAuth>
             }
           />
           <Route
             path="chat"
             element={
-              <ChatComponent
-                currentUser={currentUser}
-                setCurrentUser={setCurrentUser}
-              />
+              <RequireAuth>
+                <ChatComponent />
+              </RequireAuth>
             }
           />
           <Route
             path="post"
             element={
-              <PostComponent
-                boards={boards}
-                currentUser={currentUser}
-                setCurrentUser={setCurrentUser}
-              />
+              <RequireAuth>
+                <PostComponent boards={boards} />
+              </RequireAuth>
             }
           />
         </Route>

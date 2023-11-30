@@ -4,7 +4,7 @@ const dotenv = require("dotenv");
 dotenv.config();
 const cors = require("cors");
 const corsOptions = {
-  origin: process.env., // 允许前端应用的源
+  origin: process.env.APP_URI, // 允许前端应用的源
   methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
   credentials: true, // 如果需要支持凭证
   optionsSuccessStatus: 204,

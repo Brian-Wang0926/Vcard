@@ -14,15 +14,16 @@ import LikeRed from "../icons/like_red.svg";
 import SaveButton from "./SaveButton";
 import { handleSaveArticle } from "../utils/articleUtils";
 
+import useUserStore from "../stores/userStore";
+
 const ArticleModal = ({
   article,
   onClose,
-  currentUser,
-  setCurrentUser,
   updateArticleInList,
   onEditArticle,
   onDeleteArticle,
 }) => {
+  const { currentUser, setCurrentUser } = useUserStore();
   const [comments, setComments] = useState([]);
   const [newComment, setNewComment] = useState("");
   const [editingCommentId, setEditingCommentId] = useState(null); // 正在編輯的留言
@@ -30,7 +31,7 @@ const ArticleModal = ({
   const [articleLiked, setArticleLiked] = useState(false);
 
   const [isArticleSaved, setIsArticleSaved] = useState(
-    currentUser && currentUser.savedArticles
+    currentUser && Array.isArray(currentUser.savedArticles)
       ? currentUser.savedArticles.includes(article._id)
       : false
   );
@@ -71,6 +72,7 @@ const ArticleModal = ({
   // 新增留言
   const handleAddComment = async () => {
     if (!newComment.trim()) return;
+    if (!currentUser) return;
     try {
       const response = await axios.post(
         `${process.env.REACT_APP_API_URL}/api/comment/${article._id}`,
@@ -91,6 +93,7 @@ const ArticleModal = ({
   // 處理留言的更新
   const handleUpdateComment = async (commentId) => {
     if (!editedText.trim()) return;
+    if (!currentUser) return;
     try {
       await axios.put(
         `${process.env.REACT_APP_API_URL}/api/comment/${commentId}`,
@@ -124,18 +127,30 @@ const ArticleModal = ({
     }
   };
 
+  useEffect(() => {
+    console.log("ArticleModal 组件挂载，当前用户:", currentUser);
+  }, []);
+
   // 文章愛心
   useEffect(() => {
     console.log("articleLiked 更新為", articleLiked);
   }, [articleLiked]);
 
   useEffect(() => {
-    // 假设 article 是您从 API 或 props 获取的文章数据
-    const isLiked = article.likes.includes(currentUser.id);
-    setArticleLiked(isLiked);
-  }, [article, currentUser.id]);
+    if (currentUser) {
+      const isLiked = article.likes.includes(currentUser.id);
+
+      let isSaved = false;
+      if (Array.isArray(currentUser.savedArticles)) {
+        isSaved = currentUser.savedArticles.includes(article._id);
+      }
+      setArticleLiked(isLiked);
+      setIsArticleSaved(isSaved);
+    }
+  }, [article, currentUser]);
 
   const toggleLikeArticle = async () => {
+    if (!currentUser) return;
     try {
       const response = await axios.put(
         `${process.env.REACT_APP_API_URL}/api/article/${article._id}/like`,
@@ -155,8 +170,8 @@ const ArticleModal = ({
 
   const HeartButton = () => (
     <img
-      src={articleLiked ? LikeRed : LikeGray}
-      onClick={toggleLikeArticle}
+      src={currentUser && articleLiked ? LikeRed : LikeGray}
+      onClick={currentUser ? toggleLikeArticle : null}
       alt="like button"
       className="h-6 w-6 mx-2 cursor-pointer"
     />
@@ -164,6 +179,7 @@ const ArticleModal = ({
 
   // 留言點愛心
   const toggleLikeComment = async (commentId) => {
+    if (!currentUser) return;
     try {
       const response = await axios.put(
         `${process.env.REACT_APP_API_URL}/api/comment/${commentId}/like`,
@@ -190,7 +206,11 @@ const ArticleModal = ({
 
   const CommentHeartButton = ({ comment, toggleLike }) => (
     <img
-      src={comment.likes.includes(currentUser.id) ? LikeRed : LikeGray}
+      src={
+        currentUser && comment.likes.includes(currentUser.id)
+          ? LikeRed
+          : LikeGray
+      }
       onClick={() => toggleLike(comment._id)}
       alt="like button"
       className="h-6 w-6 mx-2 cursor-pointer"
@@ -207,14 +227,6 @@ const ArticleModal = ({
       onClose();
     }
   };
-
-  useEffect(() => {
-    if (currentUser && currentUser.savedArticles) {
-      setIsArticleSaved(currentUser.savedArticles.includes(article._id));
-    } else {
-      setIsArticleSaved(false);
-    }
-  }, [currentUser, article._id]);
 
   const handleSave = async (event) => {
     const isSavedNow = await handleSaveArticle(
@@ -303,7 +315,7 @@ const ArticleModal = ({
                     </div>
                     {/* 編輯按鈕 */}
                     <div className="flex items-center ml-auto">
-                      {currentUser.id === comment.author._id && (
+                      {currentUser && currentUser.id === comment.author._id && (
                         <>
                           {editingCommentId === comment._id ? (
                             <>
@@ -383,7 +395,11 @@ const ArticleModal = ({
               Send
             </button>
             <HeartButton />
-            <SaveButton isSaved={isArticleSaved} onSave={handleSave} />
+            <SaveButton
+              articleId={article._id}
+              isSaved={isArticleSaved}
+              onSave={currentUser ? handleSave : null}
+            />
           </div>
         </div>
       </div>

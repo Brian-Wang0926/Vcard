@@ -3,14 +3,12 @@ import moment from "moment";
 import LikeRed from "../icons/like_red.svg";
 import message from "../icons/message.svg";
 import SaveButton from "./SaveButton";
-import useArticleSave from "../hooks/useArticleSave";
+import useUserStore from "../stores/userStore";
 
-const Article = ({ article, currentUser, setCurrentUser, onArticleClick }) => {
-  const { isArticleSaved, handleSave } = useArticleSave(
-    article._id,
-    currentUser,
-    setCurrentUser
-  );
+const Article = ({ article, onArticleClick }) => {
+  const { savedArticles } = useUserStore();
+  const isArticleSaved = savedArticles.has(article._id);
+
   const imageRegex = /!\[.*?\]\((.*?)\)/;
   const match = article.content.match(imageRegex);
   const firstImageUrl = match ? match[1] : null;
@@ -34,10 +32,7 @@ const Article = ({ article, currentUser, setCurrentUser, onArticleClick }) => {
           <span className="truncate mr-3">{article.likes.length}</span>
           <img src={message} alt="message" className="h-4 w-4 mr-2" />
           <span className="truncate mr-3">{article.commentCount}</span>
-          <SaveButton
-            isSaved={isArticleSaved}
-            onSave={(event) => handleSave(event, article._id)}
-          />
+          <SaveButton articleId={article._id} isSaved={isArticleSaved} />
         </div>
       </div>
       {firstImageUrl && (

@@ -1,27 +1,29 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import authServiceInstance from "../services/auth-service";
+import useUserStore from "../stores/userStore";
 
 function FriendListComponent(props) {
   const [friends, setFriends] = useState([]);
+  const { currentUser } = useUserStore();
 
   useEffect(() => {
     async function fetchFriends() {
       try {
-        const headers = authServiceInstance.authHeader();
-        const response = await axios.get(
-          `${process.env.REACT_APP_API_URL}/api/chat/friends`,
-          { headers }
-        );
-
-        setFriends(response.data);
+        if (currentUser && currentUser.id) {
+          const headers = authServiceInstance.authHeader();
+          const response = await axios.get(
+            `${process.env.REACT_APP_API_URL}/api/chat/friends`,
+            { headers }
+          );
+          setFriends(response.data);
+        }
       } catch (error) {
         console.error("Failed to fetch friends:", error);
       }
     }
-
     fetchFriends();
-  }, [props.currentUser.id]);
+  }, [currentUser]);
 
   useEffect(() => {
     // 當好友列表載入後，檢查是否有好友，並預設點選第一個好友

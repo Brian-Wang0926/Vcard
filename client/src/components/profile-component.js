@@ -3,12 +3,14 @@ import authServiceInstance from "../services/auth-service";
 import moment from "moment-timezone";
 import axios from "axios";
 import ArticleListComponent from "./articleList-component";
+import useUserStore from "../stores/userStore";
 
-const ProfileComponent = ({ currentUser, setCurrentUser }) => {
+const ProfileComponent = () => {
   const [userProfile, setUserProfile] = useState(null);
   const [activeTab, setActiveTab] = useState("profile");
   const [userArticles, setUserArticles] = useState([]);
   const [savedArticles, setSavedArticles] = useState([]);
+  const { currentUser, setCurrentUser } = useUserStore();
 
   // 使用 moment-timezone 轉換時間為 UTC+8
   const formatAsUTC8 = (dateString) => {
@@ -22,6 +24,7 @@ const ProfileComponent = ({ currentUser, setCurrentUser }) => {
           `${process.env.REACT_APP_API_URL}/api/article/user`,
           { headers: authServiceInstance.authHeader() }
         );
+        console.log("我的文章", currentUser?.id, response.data);
         setUserArticles(response.data);
       } catch (error) {
         console.error("Error fetching user articles:", error);
@@ -45,7 +48,6 @@ const ProfileComponent = ({ currentUser, setCurrentUser }) => {
     };
 
     fetchProfile();
-
   }, [currentUser, activeTab, fetchUserArticles]);
 
   const renderContent = () => {
@@ -151,7 +153,6 @@ const ProfileComponent = ({ currentUser, setCurrentUser }) => {
       fetchSavedArticles();
     }
   }, [currentUser, activeTab, fetchUserArticles, fetchSavedArticles]);
-
 
   return (
     <div className="flex pt-14 max-w-screen-xl mx-auto overflow-hidden h-screen">

@@ -26,10 +26,10 @@ const saveArticle = async (req, res) => {
   try {
     if (user.savedArticles.includes(articleId)) {
       user.savedArticles.pull(articleId);
-      console.log("後端成功取消儲存文章");
+      console.log("後端成功取消收藏文章");
     } else {
       user.savedArticles.push(articleId);
-      console.log("後端成功儲存文章");
+      console.log("後端成功收藏文章");
     }
     await user.save();
 

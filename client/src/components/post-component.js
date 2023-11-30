@@ -7,8 +7,9 @@ import "highlight.js/styles/github.css";
 import "react-markdown-editor-lite/lib/index.css";
 import axios from "axios";
 import authServiceInstance from "../services/auth-service";
+import useUserStore from "../stores/userStore";
 
-const PostComponent = ({ boards, currentUser }) => {
+const PostComponent = ({ boards }) => {
   const navigate = useNavigate();
   const [title, setTitle] = useState("");
   const [selectedBoard, setSelectedBoard] = useState("");
@@ -17,6 +18,7 @@ const PostComponent = ({ boards, currentUser }) => {
   const location = useLocation();
   const { state } = location;
   const articleToEdit = state?.article;
+  const { currentUser } = useUserStore();
 
   const mdParser = new MarkdownIt({
     breaks: true,
@@ -156,7 +158,7 @@ const PostComponent = ({ boards, currentUser }) => {
       title,
       board: selectedBoard,
       content: updatedContent,
-      author: currentUser.id,
+      author: currentUser?.id,
     };
 
     console.log("Article Data: ", articleData);
