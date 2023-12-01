@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import moment from "moment";
 import axios from "axios";
 import authServiceInstance from "../services/auth-service";
+import { useNavigate } from "react-router-dom";
 
 import hljs from "highlight.js";
 import "highlight.js/styles/github.css";
@@ -16,25 +17,56 @@ import { handleSaveArticle } from "../utils/articleUtils";
 
 import useUserStore from "../stores/userStore";
 
-const ArticleModal = ({
-  article,
-  onClose,
-  updateArticleInList,
-  onEditArticle,
-  onDeleteArticle,
-}) => {
+const ArticleModal = ({ articleId, onClose, updateArticleInList }) => {
   const { currentUser, setCurrentUser } = useUserStore();
   const [comments, setComments] = useState([]);
   const [newComment, setNewComment] = useState("");
   const [editingCommentId, setEditingCommentId] = useState(null); // 正在編輯的留言
   const [editedText, setEditedText] = useState(""); // 編輯的文本
   const [articleLiked, setArticleLiked] = useState(false);
+  const navigate = useNavigate();
+  const [article, setArticle] = useState("");
 
-  const [isArticleSaved, setIsArticleSaved] = useState(
-    currentUser && Array.isArray(currentUser.savedArticles)
-      ? currentUser.savedArticles.includes(article._id)
-      : false
-  );
+  const [isArticleSaved, setIsArticleSaved] = useState(false);
+
+  // 測試
+  // useEffect(() => {
+  //   console.log("ArticleModal 组件挂载，当前用户:", currentUser);
+  //   console.log("articleLiked 更新為", articleLiked);
+  //   console.log("article 更新為", article);
+  // }, [articleLiked, currentUser, article]);
+
+  // 取得文章
+  useEffect(() => {
+    const fetchFullArticle = async () => {
+      try {
+        console.log("有進入fetchFullArticle");
+        const response = await axios.get(
+          `${process.env.REACT_APP_API_URL}/api/article/${articleId}`,
+          { headers: authServiceInstance.authHeader() }
+        );
+        setArticle(response.data);
+        console.log("成功取得完整文章", response.data);
+      } catch (error) {
+        console.error("Error fetching full article:", error);
+      }
+    };
+
+    if (articleId) {
+      console.log("有文章id", articleId);
+      fetchFullArticle();
+    }
+  }, [articleId]);
+
+  useEffect(() => {
+    if (article) {
+      setIsArticleSaved(
+        currentUser && Array.isArray(currentUser.savedArticles)
+          ? currentUser.savedArticles.includes(articleId)
+          : false
+      );
+    }
+  }, [article, articleId, currentUser]);
 
   // 初始化 Markdown 解析器
   const mdParser = new MarkdownIt({
@@ -55,12 +87,35 @@ const ArticleModal = ({
   };
 
   const formattedDate = moment(article.createdAt).format("YYYY-MM-DD HH:mm:ss");
+
+  // 文章功能
+  // 刪除文章
+  const handleDeleteArticle = async (articleId) => {
+    if (window.confirm("確定要刪除這篇文章？刪掉就無法復原！")) {
+      try {
+        await axios.delete(
+          `${process.env.REACT_APP_API_URL}/api/article/${articleId}`,
+          { headers: authServiceInstance.authHeader() }
+        );
+        onClose();
+      } catch (error) {
+        console.error("Error deleting article:", error);
+      }
+    }
+  };
+
+  // 更新文章
+  const handleEditArticle = () => {
+    navigate("/post", { state: { article } });
+  };
+
+  // 文章留言功能
   // 取得留言
   useEffect(() => {
     const fetchComments = async () => {
       try {
         const response = await axios.get(
-          `${process.env.REACT_APP_API_URL}/api/comment/${article._id}`
+          `${process.env.REACT_APP_API_URL}/api/comment/${articleId}`
         );
         setComments(response.data);
       } catch (error) {
@@ -68,18 +123,18 @@ const ArticleModal = ({
       }
     };
     fetchComments();
-  }, [article._id]);
+  }, [articleId]);
   // 新增留言
   const handleAddComment = async () => {
     if (!newComment.trim()) return;
     if (!currentUser) return;
     try {
       const response = await axios.post(
-        `${process.env.REACT_APP_API_URL}/api/comment/${article._id}`,
+        `${process.env.REACT_APP_API_URL}/api/comment/${articleId}`,
         {
           text: newComment,
           author: currentUser.id,
-          article: article._id,
+          article: articleId,
         },
         { headers: authServiceInstance.authHeader() }
       );
@@ -90,7 +145,7 @@ const ArticleModal = ({
       console.error("Error submitting comment:", error);
     }
   };
-  // 處理留言的更新
+  // 更新留言
   const handleUpdateComment = async (commentId) => {
     if (!editedText.trim()) return;
     if (!currentUser) return;
@@ -114,7 +169,7 @@ const ArticleModal = ({
       console.error("Error updating comment:", error);
     }
   };
-  // 處理留言的刪除
+  // 刪除留言
   const handleDeleteComment = async (commentId) => {
     try {
       await axios.delete(
@@ -127,25 +182,11 @@ const ArticleModal = ({
     }
   };
 
+  // 文章愛心功能
   useEffect(() => {
-    console.log("ArticleModal 组件挂载，当前用户:", currentUser);
-  }, []);
-
-  // 文章愛心
-  useEffect(() => {
-    console.log("articleLiked 更新為", articleLiked);
-  }, [articleLiked]);
-
-  useEffect(() => {
-    if (currentUser) {
-      const isLiked = article.likes.includes(currentUser.id);
-
-      let isSaved = false;
-      if (Array.isArray(currentUser.savedArticles)) {
-        isSaved = currentUser.savedArticles.includes(article._id);
-      }
+    if (currentUser && article) {
+      const isLiked = article.likes && article.likes.includes(currentUser.id);
       setArticleLiked(isLiked);
-      setIsArticleSaved(isSaved);
     }
   }, [article, currentUser]);
 
@@ -153,7 +194,7 @@ const ArticleModal = ({
     if (!currentUser) return;
     try {
       const response = await axios.put(
-        `${process.env.REACT_APP_API_URL}/api/article/${article._id}/like`,
+        `${process.env.REACT_APP_API_URL}/api/article/${articleId}/like`,
         {},
         { headers: authServiceInstance.authHeader() }
       );
@@ -177,7 +218,7 @@ const ArticleModal = ({
     />
   );
 
-  // 留言點愛心
+  // 留言愛心功能
   const toggleLikeComment = async (commentId) => {
     if (!currentUser) return;
     try {
@@ -217,20 +258,9 @@ const ArticleModal = ({
     />
   );
 
-  const handleEdit = () => {
-    onEditArticle(article);
-  };
-
-  const handleDelete = async () => {
-    if (window.confirm("確定要刪除這篇文章？刪掉就無法復原！")) {
-      onDeleteArticle(article._id);
-      onClose();
-    }
-  };
-
   const handleSave = async (event) => {
     const isSavedNow = await handleSaveArticle(
-      article._id,
+      articleId,
       event,
       currentUser,
       setCurrentUser
@@ -238,7 +268,9 @@ const ArticleModal = ({
     setIsArticleSaved(isSavedNow);
   };
 
-  if (!article) return null;
+  if (!article) {
+    return <div>Loading article...</div>;
+  }
 
   return (
     <>
@@ -263,13 +295,14 @@ const ArticleModal = ({
             <div className="absolute top-4 right-10">
               <button
                 className="bg-blue-500 hover:bg-blue-700 text-white font-bold p-1 rounded mr-2"
-                onClick={handleEdit}
+                onClick={() => handleEditArticle()}
               >
                 編輯
               </button>
               <button
                 className="bg-red-500 hover:bg-red-700 text-white font-bold p-1 rounded mr-2"
-                onClick={handleDelete}
+                // onClick={handleDeleteArticle}
+                onClick={() => handleDeleteArticle(articleId)}
               >
                 刪除
               </button>
@@ -396,7 +429,7 @@ const ArticleModal = ({
             </button>
             <HeartButton />
             <SaveButton
-              articleId={article._id}
+              articleId={articleId}
               isSaved={isArticleSaved}
               onSave={currentUser ? handleSave : null}
             />

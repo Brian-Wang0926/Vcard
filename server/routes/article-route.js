@@ -4,7 +4,10 @@ const { authMiddleware } = require("../controllers/auth-controller");
 
 router.get("/boards", articleController.getAllBoards);
 
-router.get("/", articleController.getArticles);
+// 取得單一完整文章
+router.get("/:id", articleController.getFullArticle);
+// 取得全部預覽文章
+router.get("/", articleController.getPartArticles);
 
 router.get("/user", authMiddleware, articleController.getArticlesByUser);
 

@@ -1,80 +1,84 @@
-import React, { useEffect, useState, useCallback } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useEffect, useState, useCallback, useRef } from "react";
 import axios from "axios";
 import authServiceInstance from "../services/auth-service";
 import ArticleModal from "./article-modal";
 import Article from "./Article";
 import useUserStore from "../stores/userStore";
 
-const ArticleListComponent = ({
-  board,
-  articles: providedArticles,
-  showOnlySaved = false,
-}) => {
-  const [articles, setArticles] = useState(providedArticles || []);
+const ArticleListComponent = ({ board, showOnlySaved = false }) => {
+  const [articles, setArticles] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [selectedArticle, setSelectedArticle] = useState(null);
-  const navigate = useNavigate();
-  const { currentUser, setCurrentUser } = useUserStore();
+  const [selectedArticleId, setSelectedArticleId] = useState(null);
+
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+  const loader = useRef(null);
+
+  const { currentUser } = useUserStore();
 
   const fetchArticles = useCallback(async () => {
     setLoading(true);
     try {
-      let response;
-      if (showOnlySaved && currentUser && currentUser.savedArticles) {
-        response = await axios.get(`${process.env.REACT_APP_API_URL}/api/profile/save-article`, { headers: authServiceInstance.authHeader() });
-        setArticles(response.data.savedArticles);
+      const endpoint = `${
+        process.env.REACT_APP_API_URL
+      }/api/article?limit=10&page=${page}${board ? "&board=" + board._id : ""}`;
+      const response = await axios.get(endpoint, {
+        headers: authServiceInstance.authHeader(),
+      });
+      if (response.data.length > 0) {
+        setArticles((prev) => [...prev, ...response.data]);
+        console.log("前端接收預覽文章", response.data);
       } else {
-        const endpoint = board ? `${process.env.REACT_APP_API_URL}/api/article?board=${board._id}` : `${process.env.REACT_APP_API_URL}/api/article`;
-        response = await axios.get(endpoint);
-        setArticles(response.data);
+        setHasMore(false);
       }
     } catch (error) {
       console.error("Error fetching articles:", error);
     } finally {
       setLoading(false);
     }
-  }, [board, providedArticles, showOnlySaved, currentUser]);
-
+  }, [board, page]);
 
   useEffect(() => {
     fetchArticles();
-  }, [fetchArticles]);
+  }, [fetchArticles, page]);
 
-  const handleArticleClick = (article) => {
-    setSelectedArticle(article);
+  const handleObserver = useCallback(
+    (entities) => {
+      const target = entities[0];
+      if (target.isIntersecting && hasMore) {
+        setPage((prevPage) => prevPage + 1);
+      }
+    },
+    [hasMore]
+  );
+
+  useEffect(() => {
+    const option = {
+      root: null,
+      rootMargin: "20px",
+      threshold: 1.0,
+    };
+    const observer = new IntersectionObserver(handleObserver, option);
+    if (loader.current) observer.observe(loader.current);
+  }, [handleObserver]);
+
+  const handleArticleClick = (articleId) => {
+    setSelectedArticleId(articleId);
   };
 
   const handleCloseModal = () => {
-    setSelectedArticle(null);
-    fetchArticles();
+    setSelectedArticleId(null);
   };
 
   const updateArticleInList = (updatedArticle) => {
-    setArticles(prevArticles => prevArticles.map(article => 
-      article._id === updatedArticle._id ? updatedArticle : article
-    ));
+    setArticles((prevArticles) =>
+      prevArticles.map((article) =>
+        article._id === updatedArticle._id ? updatedArticle : article
+      )
+    );
   };
 
-  const handleEditArticle = (article) => {
-    navigate("/post", { state: { article } });
-  };
-
-  const handleDeleteArticle = async (articleId) => {
-    if (window.confirm("確定要刪除這篇文章？刪掉就無法復原！")) {
-      try {
-        await axios.delete(
-          `${process.env.REACT_APP_API_URL}/api/article/${articleId}`,
-          { headers: authServiceInstance.authHeader() }
-        );
-        setArticles(prevArticles => prevArticles.filter(article => article._id !== articleId));
-      } catch (error) {
-        console.error("Error deleting article:", error);
-      }
-    }
-  };
-
-  if (loading) {
+  if (loading && page === 1) {
     return <div>Loading...</div>;
   }
 
@@ -86,23 +90,20 @@ const ArticleListComponent = ({
 
       {articles.length > 0 ? (
         <div>
-          {articles.map((article) => (
+          {articles.map((articlePreview) => (
             <Article
-              key={article._id}
-              article={article}
-              currentUser={currentUser}
-              setCurrentUser={setCurrentUser}
-              onArticleClick={handleArticleClick}
+              key={articlePreview._id}
+              article={articlePreview}
+              onArticleClick={() => handleArticleClick(articlePreview._id)}
             />
           ))}
-          {selectedArticle && (
+          <div ref={loader} />
+          {selectedArticleId && (
             <ArticleModal
-              article={selectedArticle}
+              articleId={selectedArticleId}
               onClose={handleCloseModal}
               currentUser={currentUser}
               updateArticleInList={updateArticleInList}
-              onEditArticle={handleEditArticle}
-              onDeleteArticle={handleDeleteArticle}
             />
           )}
         </div>

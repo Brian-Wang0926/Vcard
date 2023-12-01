@@ -13,17 +13,56 @@ const getAllBoards = async (req, res) => {
   }
 };
 
-const getArticles = async (req, res) => {
+const getFullArticle = async (req, res) => {
+  try {
+    console.log("後端取得完整文章開始");
+    const articleId = req.params.id;
+    const article = await Article.findById(articleId)
+      .populate("author", "name")
+      .populate("board", "name");
+
+    if (!article) {
+      return res.status(404).json({ message: "文章未找到" });
+    }
+    console.log("後端取得完整文章", article);
+    res.json(article);
+  } catch (e) {
+    res.status(500).json({ message: "無法獲取文章", e });
+  }
+};
+
+const getPartArticles = async (req, res) => {
   try {
     let query = {};
     if (req.query.board) {
       query.board = req.query.board;
     }
+    const limit = parseInt(req.query.limit) || 10;
+    const page = parseInt(req.query.page) || 1;
+
     const articles = await Article.find(query)
       .populate("author", "name")
       .populate("board", "name")
-      .sort({ createdAt: -1 });
-    res.json(articles);
+      .sort({ createdAt: -1 })
+      .limit(limit)
+      .skip(limit * (page - 1));
+
+    // 提取文章预览信息
+    const articlesPreview = articles.map((article) => {
+      const imageRegex = /!\[.*?\]\((.*?)\)/;
+      const textRegex = /(?:\r\n|\r|\n|^)([^]*?)(?:\r\n|\r|\n|$)/;
+      const firstImageUrl = article.content.match(imageRegex)?.[1] || null;
+      const previewText =
+        article.content.match(textRegex)?.[1]?.slice(0, 100) || "";
+
+      return {
+        ...article.toObject(),
+        content: previewText,
+        firstImageUrl: firstImageUrl,
+      };
+    });
+    console.log("資料庫取得預覽文章", articlesPreview);
+    res.json(articlesPreview);
   } catch (e) {
     res.status(500).json({ message: "無法獲取文章", e });
   }
@@ -47,6 +86,7 @@ const getArticlesByUser = async (req, res) => {
 
 const uploadImageToS3 = async (req, res) => {
   try {
+    console.log("後端開始uploadImageToS3")
     const { getSignedUrl } = require("@aws-sdk/s3-request-presigner");
     const { S3Client, PutObjectCommand } = require("@aws-sdk/client-s3");
 
@@ -170,7 +210,8 @@ const likeArticle = async (req, res) => {
 module.exports = {
   getAllBoards,
   createArticle,
-  getArticles,
+  getFullArticle,
+  getPartArticles,
   uploadImageToS3,
   getArticlesByUser,
   deleteArticle,

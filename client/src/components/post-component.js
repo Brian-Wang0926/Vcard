@@ -98,7 +98,7 @@ const PostComponent = ({ boards }) => {
           file.name
         )}&fileType=${file.type}`
       );
-
+      console.log("前端上傳到s3結束", response);
       if (!response.ok) {
         throw new Error("Unable to get presigned URL");
       }

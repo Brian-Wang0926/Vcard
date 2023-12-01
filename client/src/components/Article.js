@@ -9,11 +9,6 @@ const Article = ({ article, onArticleClick }) => {
   const { savedArticles } = useUserStore();
   const isArticleSaved = savedArticles.has(article._id);
 
-  const imageRegex = /!\[.*?\]\((.*?)\)/;
-  const match = article.content.match(imageRegex);
-  const firstImageUrl = match ? match[1] : null;
-  const textWithoutImages = article.content.replace(imageRegex, "");
-  const previewText = textWithoutImages.slice(0, 150);
   const formattedDate = moment(article.createdAt).format("YYYY-MM-DD HH:mm:ss");
 
   return (
@@ -26,7 +21,7 @@ const Article = ({ article, onArticleClick }) => {
           {article.board.name} / {formattedDate}
         </div>
         <div className="text-lg truncate ...">{article.title}</div>
-        <div className="text-sm truncate ...">{previewText}</div>
+        <div className="text-sm truncate ...">{article.content}</div>
         <div className="flex items-center text-sm text-gray-500 mt-2 overflow-hidden">
           <img src={LikeRed} alt="like button" className="h-4 w-4 mr-2" />
           <span className="truncate mr-3">{article.likes.length}</span>
@@ -35,10 +30,10 @@ const Article = ({ article, onArticleClick }) => {
           <SaveButton articleId={article._id} isSaved={isArticleSaved} />
         </div>
       </div>
-      {firstImageUrl && (
+      {article.firstImageUrl && (
         <div className="relative w-24 h-24 overflow-hidden rounded-lg">
           <img
-            src={firstImageUrl}
+            src={article.firstImageUrl}
             alt="Article preview"
             className="absolute object-cover w-full h-full top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"
           />
