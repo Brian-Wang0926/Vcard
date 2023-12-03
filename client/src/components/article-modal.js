@@ -13,12 +13,11 @@ import LikeGray from "../icons/like_gray.svg";
 import LikeRed from "../icons/like_red.svg";
 
 import SaveButton from "./SaveButton";
-import { handleSaveArticle } from "../utils/articleUtils";
 
 import useUserStore from "../stores/userStore";
 
-const ArticleModal = ({ articleId, onClose, updateArticleInList }) => {
-  const { currentUser, setCurrentUser } = useUserStore();
+const ArticleModal = ({ articleId, onClose, onUpdate }) => {
+  const { currentUser } = useUserStore();
   const [comments, setComments] = useState([]);
   const [newComment, setNewComment] = useState("");
   const [editingCommentId, setEditingCommentId] = useState(null); // 正在編輯的留言
@@ -26,8 +25,6 @@ const ArticleModal = ({ articleId, onClose, updateArticleInList }) => {
   const [articleLiked, setArticleLiked] = useState(false);
   const navigate = useNavigate();
   const [article, setArticle] = useState("");
-
-  const [isArticleSaved, setIsArticleSaved] = useState(false);
 
   // 測試
   // useEffect(() => {
@@ -57,16 +54,6 @@ const ArticleModal = ({ articleId, onClose, updateArticleInList }) => {
       fetchFullArticle();
     }
   }, [articleId]);
-
-  useEffect(() => {
-    if (article) {
-      setIsArticleSaved(
-        currentUser && Array.isArray(currentUser.savedArticles)
-          ? currentUser.savedArticles.includes(articleId)
-          : false
-      );
-    }
-  }, [article, articleId, currentUser]);
 
   // 初始化 Markdown 解析器
   const mdParser = new MarkdownIt({
@@ -140,6 +127,14 @@ const ArticleModal = ({ articleId, onClose, updateArticleInList }) => {
       );
       setComments([...comments, response.data]);
       setNewComment("");
+
+      const updatedArticle = {
+        ...article,
+        commentCount: article.commentCount + 1,
+      };
+      console.log("留言updatedArticle", updatedArticle);
+      setArticle(updatedArticle);
+      onUpdate(updatedArticle);
       console.log("新增留言成功");
     } catch (error) {
       console.error("Error submitting comment:", error);
@@ -177,6 +172,13 @@ const ArticleModal = ({ articleId, onClose, updateArticleInList }) => {
         { headers: authServiceInstance.authHeader() }
       );
       setComments(comments.filter((comment) => comment._id !== commentId));
+      const updatedArticle = {
+        ...article,
+        commentCount: article.commentCount - 1,
+      };
+      console.log("留言updatedArticle", updatedArticle);
+      setArticle(updatedArticle);
+      onUpdate(updatedArticle);
     } catch (error) {
       console.error("Error deleting comment:", error);
     }
@@ -203,7 +205,10 @@ const ArticleModal = ({ articleId, onClose, updateArticleInList }) => {
         response.data.likes.includes(currentUser.id)
       );
       setArticleLiked(response.data.likes.includes(currentUser.id));
-      updateArticleInList(response.data);
+
+      const updatedArticle = { ...article, likes: response.data.likes };
+      setArticle(updatedArticle);
+      onUpdate(updatedArticle);
     } catch (error) {
       console.error("Error toggling like:", error);
     }
@@ -258,16 +263,6 @@ const ArticleModal = ({ articleId, onClose, updateArticleInList }) => {
     />
   );
 
-  const handleSave = async (event) => {
-    const isSavedNow = await handleSaveArticle(
-      articleId,
-      event,
-      currentUser,
-      setCurrentUser
-    );
-    setIsArticleSaved(isSavedNow);
-  };
-
   if (!article) {
     return <div>Loading article...</div>;
   }
@@ -292,15 +287,15 @@ const ArticleModal = ({ articleId, onClose, updateArticleInList }) => {
           </button>
 
           {currentUser && article.author._id === currentUser.id && (
-            <div className="absolute top-4 right-10">
+            <div className="absolute top-0 right-10">
               <button
-                className="bg-blue-500 hover:bg-blue-700 text-white font-bold p-1 rounded mr-2"
+                className="bg-blue-500 hover:bg-blue-700 text-white font-bold p-0.5 rounded mr-2 text-xs"
                 onClick={() => handleEditArticle()}
               >
                 編輯
               </button>
               <button
-                className="bg-red-500 hover:bg-red-700 text-white font-bold p-1 rounded mr-2"
+                className="bg-red-500 hover:bg-red-700 text-white font-bold p-0.5 rounded mr-2 text-xs"
                 // onClick={handleDeleteArticle}
                 onClick={() => handleDeleteArticle(articleId)}
               >
@@ -353,13 +348,13 @@ const ArticleModal = ({ articleId, onClose, updateArticleInList }) => {
                           {editingCommentId === comment._id ? (
                             <>
                               <button
-                                className="bg-green-500 hover:bg-green-700 text-white font-bold py-1 px-2 rounded mr-2"
+                                className="bg-green-500 hover:bg-green-700 text-white font-bold p-1 rounded mr-2 text-xs"
                                 onClick={() => handleUpdateComment(comment._id)}
                               >
                                 保存
                               </button>
                               <button
-                                className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-1 px-2 rounded"
+                                className="bg-gray-500 hover:bg-gray-700 text-white font-bold p-1 rounded text-xs"
                                 onClick={() => setEditingCommentId(null)}
                               >
                                 取消
@@ -368,16 +363,16 @@ const ArticleModal = ({ articleId, onClose, updateArticleInList }) => {
                           ) : (
                             <>
                               <button
-                                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded mr-2"
+                                className="bg-blue-500 hover:bg-blue-700 text-white font-bold p-1 rounded mr-2 text-xs"
                                 onClick={() => {
                                   setEditingCommentId(comment._id);
                                   setEditedText(comment.text);
                                 }}
                               >
-                                修改
+                                編輯
                               </button>
                               <button
-                                className="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded"
+                                className="bg-red-500 hover:bg-red-700 text-white font-bold p-1 rounded text-xs"
                                 onClick={() => handleDeleteComment(comment._id)}
                               >
                                 刪除
@@ -428,11 +423,7 @@ const ArticleModal = ({ articleId, onClose, updateArticleInList }) => {
               Send
             </button>
             <HeartButton />
-            <SaveButton
-              articleId={articleId}
-              isSaved={isArticleSaved}
-              onSave={currentUser ? handleSave : null}
-            />
+            <SaveButton articleId={articleId} />
           </div>
         </div>
       </div>

@@ -11,18 +11,19 @@ import ChatComponent from "./components/chat-component";
 import PostComponent from "./components/post-component";
 import useUserStore from "./stores/userStore";
 import authServiceInstance from "./services/auth-service";
-import RedirectToHome from './components/redirectToHome';
+import RedirectToHome from "./components/redirectToHome";
 
 function App() {
   const [boards, setBoards] = useState([]); // 新增看板數據的狀態
-  const { setCurrentUser } = useUserStore();
+  const { setCurrentUser, setAuthChecked } = useUserStore();
 
   useEffect(() => {
     const storedUser = authServiceInstance.getCurrentUser(); // 从 localStorage 获取用户数据
     if (storedUser) {
       setCurrentUser(storedUser); // 更新 Zustand store
     }
-  }, [setCurrentUser]);
+    setAuthChecked(true);
+  }, [setCurrentUser, setAuthChecked]);
 
   useEffect(() => {
     const fetchBoards = async () => {

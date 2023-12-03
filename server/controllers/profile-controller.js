@@ -26,10 +26,10 @@ const saveArticle = async (req, res) => {
   try {
     if (user.savedArticles.includes(articleId)) {
       user.savedArticles.pull(articleId);
-      console.log("後端成功取消收藏文章");
+      console.log("後端成功取消收藏文章", articleId);
     } else {
       user.savedArticles.push(articleId);
-      console.log("後端成功收藏文章");
+      console.log("後端成功收藏文章", articleId);
     }
     await user.save();
 
@@ -47,10 +47,11 @@ const getSaveArticle = async (req, res) => {
     if (!user) {
       return res.status(404).send({ message: "用戶未找到" });
     }
+    console.log("已成功取得收藏文章", user.savedArticles);
     res.status(200).send({ savedArticles: user.savedArticles });
   } catch (error) {
     res.status(500).send({ message: "獲取收藏文章時發生錯誤" });
   }
 };
 
-module.exports = { getUserProfile, saveArticle, getSaveArticle};
+module.exports = { getUserProfile, saveArticle, getSaveArticle };

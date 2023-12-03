@@ -3,12 +3,8 @@ import moment from "moment";
 import LikeRed from "../icons/like_red.svg";
 import message from "../icons/message.svg";
 import SaveButton from "./SaveButton";
-import useUserStore from "../stores/userStore";
 
 const Article = ({ article, onArticleClick }) => {
-  const { savedArticles } = useUserStore();
-  const isArticleSaved = savedArticles.has(article._id);
-
   const formattedDate = moment(article.createdAt).format("YYYY-MM-DD HH:mm:ss");
 
   return (
@@ -27,7 +23,7 @@ const Article = ({ article, onArticleClick }) => {
           <span className="truncate mr-3">{article.likes.length}</span>
           <img src={message} alt="message" className="h-4 w-4 mr-2" />
           <span className="truncate mr-3">{article.commentCount}</span>
-          <SaveButton articleId={article._id} isSaved={isArticleSaved} />
+          <SaveButton articleId={article._id} />
         </div>
       </div>
       {article.firstImageUrl && (

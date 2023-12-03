@@ -18,10 +18,6 @@ const NavComponent = () => {
     navigate("/");
   };
 
-  const getNavLinkClass = ({ isActive }) => {
-    return isActive ? "text-black" : "text-gray-400 hover:text-gray-700";
-  };
-
   return (
     <div>
       <nav
@@ -39,35 +35,35 @@ const NavComponent = () => {
             <ul className="flex space-x-4">
               {currentUser && (
                 <li className="nav-item">
-                  <NavLink className={getNavLinkClass} to="/post">
+                  <NavLink  to="/post">
                     <img src={PenIcon} className="w-6 h-6 m-2" alt="寫文章" />
                   </NavLink>
                 </li>
               )}
               {currentUser && (
                 <li className="nav-item">
-                  <NavLink className={getNavLinkClass} to="/card">
+                  <NavLink  to="/card">
                     <img src={CardIcon} className="w-6 h-6 m-2" alt="抽卡" />
                   </NavLink>
                 </li>
               )}
               {currentUser && (
                 <li className="nav-item">
-                  <NavLink className={getNavLinkClass} to="/chat">
+                  <NavLink  to="/chat">
                     <img src={ChatIcon} className="w-6 h-6 m-2" alt="聊天" />
                   </NavLink>
                 </li>
               )}
               {currentUser && (
                 <li className="nav-item">
-                  <NavLink className={getNavLinkClass} to="/profile">
+                  <NavLink  to="/profile">
                     <img src={ProfileIcon} className="w-6 h-6 m-2" alt="個人" />
                   </NavLink>
                 </li>
               )}
               {!currentUser && (
                 <li className="nav-item">
-                  <NavLink className={getNavLinkClass} to="/login">
+                  <NavLink  to="/login">
                     登入
                   </NavLink>
                 </li>

@@ -32,13 +32,24 @@ const getFullArticle = async (req, res) => {
 };
 
 const getPartArticles = async (req, res) => {
+  console.log("開始getPartArticles");
   try {
     let query = {};
+
     if (req.query.board) {
       query.board = req.query.board;
     }
-    const limit = parseInt(req.query.limit) || 10;
+    if (req.query.authorId) {
+      query.author = req.query.authorId;
+    }
+    if (req.query.savedArticleIds) {
+      query._id = { $in: req.query.savedArticleIds.split(",") };
+    }
+
+    const limit = parseInt(req.query.limit) || 6;
     const page = parseInt(req.query.page) || 1;
+    console.log("目前後端載入筆數頁數", limit, page);
+    console.log("目前後端接收資料", query);
 
     const articles = await Article.find(query)
       .populate("author", "name")
@@ -86,7 +97,7 @@ const getArticlesByUser = async (req, res) => {
 
 const uploadImageToS3 = async (req, res) => {
   try {
-    console.log("後端開始uploadImageToS3")
+    console.log("後端開始uploadImageToS3");
     const { getSignedUrl } = require("@aws-sdk/s3-request-presigner");
     const { S3Client, PutObjectCommand } = require("@aws-sdk/client-s3");
 

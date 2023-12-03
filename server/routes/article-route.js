@@ -4,14 +4,14 @@ const { authMiddleware } = require("../controllers/auth-controller");
 
 router.get("/boards", articleController.getAllBoards);
 
+router.get("/getPresignedUrl", articleController.uploadImageToS3);
+
 // 取得單一完整文章
 router.get("/:id", articleController.getFullArticle);
 // 取得全部預覽文章
 router.get("/", articleController.getPartArticles);
 
 router.get("/user", authMiddleware, articleController.getArticlesByUser);
-
-router.get("/get-presigned-url", articleController.uploadImageToS3);
 
 router.post("/", authMiddleware, articleController.createArticle);
 

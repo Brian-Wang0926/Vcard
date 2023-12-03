@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
-import AuthService from "../services/auth-service";
 import BoardListComponent from "./boardList-component";
 import ArticleListComponent from "./articleList-component";
 import useUserStore from "../stores/userStore";
@@ -25,7 +24,7 @@ function HomeComponent({ boards, setBoards }) {
   }, [searchParams, setCurrentUser]);
 
   return (
-    <div className=" bg-gray-800 min-h-screen pt-14 overflow-hidden ">
+    <div className=" bg-gray-800 min-h-screen pt-14 ">
       <div className="flex mx-auto max-w-screen-xl">
         <div className="flex-none w-1/4">
           <BoardListComponent

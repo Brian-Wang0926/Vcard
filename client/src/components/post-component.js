@@ -82,33 +82,69 @@ const PostComponent = ({ boards }) => {
         ...prevUploadedImages,
         { blobUrl, file },
       ]);
+      console.log("前端編輯區", blobUrl);
       resolve(blobUrl); // 解析 Promise 与 blob URL
     });
   };
 
   // 送出提交
+  // const uploadImageToS3 = async (file) => {
+  //   try {
+  //     console.log("前端上傳到s3", file);
+  //     console.log("Uploading to S3, file type:", file.type, "size:", file.size);
+  //     const response = await fetch(
+  //       `${
+  //         process.env.REACT_APP_API_URL
+  //       }/api/article/get-presigned-url?fileName=${encodeURIComponent(
+  //         file.name
+  //       )}&fileType=${file.type}`
+  //     );
+  //     console.log("前端上傳到s3結束", response);
+  //     if (!response.ok) {
+  //       throw new Error("Unable to get presigned URL");
+  //     }
+
+  //     const { url: presignedUrl } = await response.json();
+  //     console.log("预签名 URL", presignedUrl);
+
+  //     await fetch(presignedUrl, {
+  //       method: "PUT",
+  //       body: file,
+  //       headers: {
+  //         "Content-Type": file.type,
+  //       },
+  //     });
+
+  //     // 构造并返回 CloudFront URL
+  //     const cloudFrontUrl = `${process.env.REACT_APP_CLOUDFRONT_URL}/${file.name}`;
+  //     console.log("CloudFront URL", cloudFrontUrl);
+  //     return cloudFrontUrl;
+  //   } catch (error) {
+  //     console.error("Error uploading image to S3:", error);
+  //     return "";
+  //   }
+  // };
+
   const uploadImageToS3 = async (file) => {
     try {
       console.log("前端上傳到s3", file);
       console.log("Uploading to S3, file type:", file.type, "size:", file.size);
-      const response = await fetch(
-        `${
-          process.env.REACT_APP_API_URL
-        }/api/article/get-presigned-url?fileName=${encodeURIComponent(
-          file.name
-        )}&fileType=${file.type}`
+
+      // 使用 axios 獲取預簽名 URL
+      const response = await axios.get(
+        `${process.env.REACT_APP_API_URL}/api/article/getPresignedUrl`,
+        {
+          params: {
+            fileName: encodeURIComponent(file.name),
+            fileType: encodeURIComponent(file.type),
+          },
+        }
       );
-      console.log("前端上傳到s3結束", response);
-      if (!response.ok) {
-        throw new Error("Unable to get presigned URL");
-      }
+      const presignedUrl = response.data.url;
+      console.log("預簽名 URL", presignedUrl);
 
-      const { url: presignedUrl } = await response.json();
-      console.log("预签名 URL", presignedUrl);
-
-      await fetch(presignedUrl, {
-        method: "PUT",
-        body: file,
+      // 使用 axios 上傳圖片到 S3
+      await axios.put(presignedUrl, file, {
         headers: {
           "Content-Type": file.type,
         },
@@ -120,7 +156,7 @@ const PostComponent = ({ boards }) => {
       return cloudFrontUrl;
     } catch (error) {
       console.error("Error uploading image to S3:", error);
-      return "";
+      throw new Error("Error uploading image to S3");
     }
   };
 

@@ -1,84 +1,32 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect } from "react";
 import authServiceInstance from "../services/auth-service";
 import moment from "moment-timezone";
-import axios from "axios";
 import ArticleListComponent from "./articleList-component";
 import useUserStore from "../stores/userStore";
 
 const ProfileComponent = () => {
   const [userProfile, setUserProfile] = useState(null);
   const [activeTab, setActiveTab] = useState("profile");
-  const [userArticles, setUserArticles] = useState([]);
-  const [savedArticles, setSavedArticles] = useState([]);
-  const { currentUser, setCurrentUser } = useUserStore();
+  const { currentUser } = useUserStore();
 
   // 使用 moment-timezone 轉換時間為 UTC+8
   const formatAsUTC8 = (dateString) => {
     return moment(dateString).tz("Asia/Shanghai").format("YYYY-MM-DD HH:mm:ss");
   };
 
-  const fetchUserArticles = useCallback(async () => {
-    if (currentUser?.id) {
-      try {
-        const response = await axios.get(
-          `${process.env.REACT_APP_API_URL}/api/article/user`,
-          { headers: authServiceInstance.authHeader() }
-        );
-        console.log("我的文章", currentUser?.id, response.data);
-        setUserArticles(response.data);
-      } catch (error) {
-        console.error("Error fetching user articles:", error);
-      }
-    }
-  }, [currentUser?.id]);
-
   useEffect(() => {
     const fetchProfile = async () => {
-      try {
-        if (currentUser && currentUser.token) {
+      if (currentUser && currentUser.token) {
+        try {
           const response = await authServiceInstance.getUserProfile();
-          if (response && response.data) {
-            // 更新用戶資料狀態
-            setUserProfile(response.data);
-          }
+          setUserProfile(response.data);
+        } catch (error) {
+          console.error("Error fetching profile:", error);
         }
-      } catch (error) {
-        console.error("Error fetching profile:", error);
       }
     };
-
     fetchProfile();
-  }, [currentUser, activeTab, fetchUserArticles]);
-
-  const renderContent = () => {
-    if (!currentUser) {
-      return <div>在獲取您的個人資料之前，您必須先登錄。</div>;
-    }
-
-    switch (activeTab) {
-      case "profile":
-        return renderProfileSection();
-      case "posts":
-        return (
-          <ArticleListComponent
-            articles={userArticles}
-            currentUser={currentUser}
-            setCurrentUser={setCurrentUser}
-          />
-        );
-      case "save":
-        return (
-          <ArticleListComponent
-            articles={savedArticles}
-            currentUser={currentUser}
-            setCurrentUser={setCurrentUser}
-            showOnlySaved
-          />
-        );
-      default:
-        return <div>請選擇一個選項</div>;
-    }
-  };
+  }, [currentUser]);
 
   const renderProfileSection = () => {
     if (userProfile) {
@@ -132,27 +80,18 @@ const ProfileComponent = () => {
     return <div>Loading...</div>;
   };
 
-  const fetchSavedArticles = useCallback(async () => {
-    try {
-      console.log("開始fetchSavedArticles");
-      const response = await axios.get(
-        `${process.env.REACT_APP_API_URL}/api/profile/save-article`,
-        { headers: authServiceInstance.authHeader() }
-      );
-      console.log("後端收藏文章123", response.data.savedArticles);
-      setSavedArticles(response.data.savedArticles);
-    } catch (error) {
-      console.error("Error fetching saved articles:", error);
+  const renderContent = () => {
+    switch (activeTab) {
+      case "profile":
+        return renderProfileSection();
+      case "posts":
+        return <ArticleListComponent showOnlyUserArticles={true} />;
+      case "save":
+        return <ArticleListComponent showOnlySavedArticles={true} />;
+      default:
+        return <div>请选择一个选项</div>;
     }
-  }, []);
-
-  useEffect(() => {
-    if (activeTab === "posts" && currentUser) {
-      fetchUserArticles();
-    } else if (activeTab === "save" && currentUser) {
-      fetchSavedArticles();
-    }
-  }, [currentUser, activeTab, fetchUserArticles, fetchSavedArticles]);
+  };
 
   return (
     <div className="flex pt-14 max-w-screen-xl mx-auto overflow-hidden h-screen">
