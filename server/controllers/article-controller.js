@@ -1,12 +1,23 @@
 const Article = require("../models/article-model");
 const Board = require("../models/board-model");
+const redisClient = require("../redis-client");
 const dotenv = require("dotenv");
 dotenv.config();
 
 // 看板
 const getAllBoards = async (req, res) => {
+  const cacheKey = "allBoards";
+
   try {
+    const cachedBoards = await redisClient.get(cacheKey);
+    if (cachedBoards) {
+      console.log("從redis取得看板");
+      return res.json(JSON.parse(cachedBoards));
+    }
+
     const boards = await Board.find();
+    console.log("資料庫回傳");
+    await redisClient.set(cacheKey, JSON.stringify(boards));
     res.json(boards);
   } catch (error) {
     res.status(500).send(error.message);
@@ -14,9 +25,20 @@ const getAllBoards = async (req, res) => {
 };
 
 const getFullArticle = async (req, res) => {
+  console.log("進入取得完整文章api");
+  const articleId = req.params.id;
+  const cacheKey = `article:${articleId}`;
+  console.log("取得cacheKey", cacheKey);
   try {
-    console.log("後端取得完整文章開始");
-    const articleId = req.params.id;
+    // 嘗試從 Redis 中獲取緩存數據
+    const cachedArticle = await redisClient.get(cacheKey);
+    if (cachedArticle) {
+      const article = JSON.parse(cachedArticle);
+      article.isFromCache = true;
+      return res.json(article);
+    }
+
+    // 從資料庫獲取數據
     const article = await Article.findById(articleId)
       .populate("author", "name")
       .populate("board", "name");
@@ -25,6 +47,12 @@ const getFullArticle = async (req, res) => {
       return res.status(404).json({ message: "文章未找到" });
     }
     console.log("後端取得完整文章", article);
+    article.isFromCache = false;
+    // 將數據存儲到 Redis，設置緩存時間（ 1 小時）
+    await redisClient.set(cacheKey, JSON.stringify(article), {
+      EX: 3600,
+    });
+
     res.json(article);
   } catch (e) {
     res.status(500).json({ message: "無法獲取文章", e });
@@ -34,6 +62,17 @@ const getFullArticle = async (req, res) => {
 const getPartArticles = async (req, res) => {
   console.log("開始getPartArticles");
   try {
+    const cacheKey = `articlesPreview:${JSON.stringify(req.query)}`;
+
+    // 嘗試從 Redis 中獲取緩存數據
+    const cachedArticles = await redisClient.get(cacheKey);
+    if (cachedArticles) {
+      console.log("透過redis提供");
+      const articles = JSON.parse(cachedArticles);
+      articles.forEach((article) => (article.isFromCache = true));
+      return res.json(articles);
+    }
+
     let query = {};
 
     if (req.query.board) {
@@ -70,9 +109,16 @@ const getPartArticles = async (req, res) => {
         ...article.toObject(),
         content: previewText,
         firstImageUrl: firstImageUrl,
+        isFromCache: false,
       };
     });
     console.log("資料庫取得預覽文章", articlesPreview);
+
+    // 將數據存儲到 Redis，設置緩存時間（ 1 小時）
+    await redisClient.set(cacheKey, JSON.stringify(articlesPreview), {
+      EX: 3600,
+    });
+
     res.json(articlesPreview);
   } catch (e) {
     res.status(500).json({ message: "無法獲取文章", e });

@@ -44,6 +44,7 @@ const ArticleModal = ({ articleId, onClose, onUpdate }) => {
         );
         setArticle(response.data);
         console.log("成功取得完整文章", response.data);
+        console.log(response.data.isFromCache ? "從redis獲取" : "從資料庫獲取");
       } catch (error) {
         console.error("Error fetching full article:", error);
       }

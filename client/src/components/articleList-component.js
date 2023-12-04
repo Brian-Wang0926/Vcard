@@ -58,6 +58,10 @@ const ArticleListComponent = ({
         const newArticles = response.data;
 
         if (newArticles.length > 0) {
+          newArticles.forEach((article) => {
+            console.log(article.isFromCache ? "從redis獲取" : "從資料庫獲取");
+          });
+
           setArticles((prevArticles) =>
             reset ? [...newArticles] : [...prevArticles, ...newArticles]
           );
