@@ -147,7 +147,7 @@ const ArticleListComponent = ({
 
   const handleCloseModal = () => {
     setSelectedArticleId(null);
-    fetchArticles();
+    fetchArticles(true);
   };
 
   const handleUpdate = (updatedArticle) => {
