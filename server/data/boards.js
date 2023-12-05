@@ -1,7 +1,6 @@
 const mongoose = require("mongoose");
 const Board = require("../models/board-model");
-const mongooseUri =
-  process.env.MONGODB_URI || "mongodb://localhost:27017/Vcard";
+const mongooseUri = process.env.MONGODB_URI;
 
 mongoose
   .connect(mongooseUri, {
