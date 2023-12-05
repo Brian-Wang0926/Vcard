@@ -29,7 +29,6 @@ mongoose
     console.log("連結到mongodb...");
   })
   .catch((e) => {
-    console.log("錯誤", mongooseUri);
     console.log(e);
   });
 

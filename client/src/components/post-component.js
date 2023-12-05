@@ -44,7 +44,7 @@ const PostComponent = ({ boards }) => {
 
   useEffect(() => {
     if (articleToEdit) {
-      console.log("編輯～", articleToEdit);
+      console.log("編輯文章", articleToEdit);
       // Populate form fields with the article data
       setTitle(articleToEdit.title);
       setContent(articleToEdit.content);
@@ -86,44 +86,6 @@ const PostComponent = ({ boards }) => {
       resolve(blobUrl); // 解析 Promise 与 blob URL
     });
   };
-
-  // 送出提交
-  // const uploadImageToS3 = async (file) => {
-  //   try {
-  //     console.log("前端上傳到s3", file);
-  //     console.log("Uploading to S3, file type:", file.type, "size:", file.size);
-  //     const response = await fetch(
-  //       `${
-  //         process.env.REACT_APP_API_URL
-  //       }/api/article/get-presigned-url?fileName=${encodeURIComponent(
-  //         file.name
-  //       )}&fileType=${file.type}`
-  //     );
-  //     console.log("前端上傳到s3結束", response);
-  //     if (!response.ok) {
-  //       throw new Error("Unable to get presigned URL");
-  //     }
-
-  //     const { url: presignedUrl } = await response.json();
-  //     console.log("预签名 URL", presignedUrl);
-
-  //     await fetch(presignedUrl, {
-  //       method: "PUT",
-  //       body: file,
-  //       headers: {
-  //         "Content-Type": file.type,
-  //       },
-  //     });
-
-  //     // 构造并返回 CloudFront URL
-  //     const cloudFrontUrl = `${process.env.REACT_APP_CLOUDFRONT_URL}/${file.name}`;
-  //     console.log("CloudFront URL", cloudFrontUrl);
-  //     return cloudFrontUrl;
-  //   } catch (error) {
-  //     console.error("Error uploading image to S3:", error);
-  //     return "";
-  //   }
-  // };
 
   const uploadImageToS3 = async (file) => {
     try {
@@ -168,10 +130,14 @@ const PostComponent = ({ boards }) => {
       alert("請填寫文章標題");
       return;
     }
+    
+    if (!content.trim()) {
+      alert("請填寫文章內容");
+      return;
+    }
 
     let updatedContent = content;
 
-    console.log("前端", uploadedImages);
     // 用于存储需要上传到 S3 的图片
     const imagesToUpload = uploadedImages.filter((image) =>
       image.blobUrl.startsWith("blob:")

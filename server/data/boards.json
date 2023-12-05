@@ -1,0 +1,10 @@
+[
+    { "name": "心情", "englishName": "Mood", "icon": "😔" },
+    { "name": "閒聊", "englishName": "Chat", "icon": "💬" },
+    { "name": "感情", "englishName": "Relationship", "icon": "💓" },
+    { "name": "工作", "englishName": "Work", "icon": "💼" },
+    { "name": "素食", "englishName": "Vegetarian", "icon": "🥦" },
+    { "name": "梗圖", "englishName": "Memes", "icon": "😂" },
+    { "name": "軟體工程師", "englishName": "Software Engineer", "icon": "💻" }
+  ]
+  

@@ -24,107 +24,6 @@ const getAllBoards = async (req, res) => {
   }
 };
 
-const getFullArticle = async (req, res) => {
-  console.log("進入取得完整文章api");
-  const articleId = req.params.id;
-  const cacheKey = `article:${articleId}`;
-  console.log("取得cacheKey", cacheKey);
-  try {
-    // 嘗試從 Redis 中獲取緩存數據
-    const cachedArticle = await redisClient.get(cacheKey);
-    if (cachedArticle) {
-      const article = JSON.parse(cachedArticle);
-      article.isFromCache = true;
-      return res.json(article);
-    }
-
-    // 從資料庫獲取數據
-    const article = await Article.findById(articleId)
-      .populate("author", "name")
-      .populate("board", "name");
-
-    if (!article) {
-      return res.status(404).json({ message: "文章未找到" });
-    }
-    console.log("後端取得完整文章", article);
-    article.isFromCache = false;
-    // 將數據存儲到 Redis，設置緩存時間（ 1 小時）
-    await redisClient.set(cacheKey, JSON.stringify(article), {
-      EX: 3600,
-    });
-
-    res.json(article);
-  } catch (e) {
-    res.status(500).json({ message: "無法獲取文章", e });
-  }
-};
-
-const getPartArticles = async (req, res) => {
-  console.log("開始getPartArticles");
-  try {
-    const cacheKey = `articlesPreview:${JSON.stringify(req.query)}`;
-
-    // 嘗試從 Redis 中獲取緩存數據
-    const cachedArticles = await redisClient.get(cacheKey);
-    if (cachedArticles) {
-      console.log("透過redis提供");
-      const articles = JSON.parse(cachedArticles);
-      articles.forEach((article) => (article.isFromCache = true));
-      return res.json(articles);
-    }
-
-    let query = {};
-
-    if (req.query.board) {
-      query.board = req.query.board;
-    }
-    if (req.query.authorId) {
-      query.author = req.query.authorId;
-    }
-    if (req.query.savedArticleIds) {
-      query._id = { $in: req.query.savedArticleIds.split(",") };
-    }
-
-    const limit = parseInt(req.query.limit) || 6;
-    const page = parseInt(req.query.page) || 1;
-    console.log("目前後端載入筆數頁數", limit, page);
-    console.log("目前後端接收資料", query);
-
-    const articles = await Article.find(query)
-      .populate("author", "name")
-      .populate("board", "name")
-      .sort({ createdAt: -1 })
-      .limit(limit)
-      .skip(limit * (page - 1));
-
-    // 提取文章预览信息
-    const articlesPreview = articles.map((article) => {
-      const imageRegex = /!\[.*?\]\((.*?)\)/;
-      const textRegex = /(?:\r\n|\r|\n|^)([^]*?)(?:\r\n|\r|\n|$)/;
-      const firstImageUrl = article.content.match(imageRegex)?.[1] || null;
-      const previewText =
-        article.content.match(textRegex)?.[1]?.slice(0, 100) || "";
-
-      return {
-        ...article.toObject(),
-        content: previewText,
-        firstImageUrl: firstImageUrl,
-        isFromCache: false,
-      };
-    });
-    console.log("資料庫取得預覽文章", articlesPreview);
-
-    // 將數據存儲到 Redis，設置緩存時間（ 1 小時）
-    await redisClient.set(cacheKey, JSON.stringify(articlesPreview), {
-      EX: 3600,
-    });
-
-    res.json(articlesPreview);
-  } catch (e) {
-    res.status(500).json({ message: "無法獲取文章", e });
-  }
-};
-
 const getArticlesByUser = async (req, res) => {
   try {
     const userId = req.userId;
@@ -176,6 +75,107 @@ const uploadImageToS3 = async (req, res) => {
   }
 };
 
+const getPartArticles = async (req, res) => {
+  console.log("開始getPartArticles");
+  try {
+    // const cacheKey = `articlesPreview:${JSON.stringify(req.query)}`;
+
+    // // 嘗試從 Redis 中獲取緩存數據
+    // const cachedArticles = await redisClient.get(cacheKey);
+    // if (cachedArticles) {
+    //   console.log("透過redis提供");
+    //   const articles = JSON.parse(cachedArticles);
+    //   articles.forEach((article) => (article.isFromCache = true));
+    //   return res.json(articles);
+    // }
+
+    let query = {};
+
+    if (req.query.board) {
+      query.board = req.query.board;
+    }
+    if (req.query.authorId) {
+      query.author = req.query.authorId;
+    }
+    if (req.query.savedArticleIds) {
+      query._id = { $in: req.query.savedArticleIds.split(",") };
+    }
+
+    const limit = parseInt(req.query.limit) || 6;
+    const page = parseInt(req.query.page) || 1;
+    console.log("目前後端載入筆數頁數", limit, page);
+    console.log("目前後端接收資料", query);
+
+    const articles = await Article.find(query)
+      .populate("author", "name")
+      .populate("board", "name")
+      .sort({ createdAt: -1 })
+      .limit(limit)
+      .skip(limit * (page - 1));
+
+    // 提取文章预览信息
+    const articlesPreview = articles.map((article) => {
+      const imageRegex = /!\[.*?\]\((.*?)\)/;
+      const textRegex = /(?:\r\n|\r|\n|^)([^]*?)(?:\r\n|\r|\n|$)/;
+      const firstImageUrl = article.content.match(imageRegex)?.[1] || null;
+      const previewText =
+        article.content.match(textRegex)?.[1]?.slice(0, 100) || "";
+
+      return {
+        ...article.toObject(),
+        content: previewText,
+        firstImageUrl: firstImageUrl,
+        isFromCache: false,
+      };
+    });
+    console.log("資料庫取得預覽文章", articlesPreview);
+
+    // 將數據存儲到 Redis，設置緩存時間（ 1 小時）
+    // await redisClient.set(cacheKey, JSON.stringify(articlesPreview), {
+    //   EX: 3600,
+    // });
+
+    res.json(articlesPreview);
+  } catch (e) {
+    res.status(500).json({ message: "無法獲取文章", e });
+  }
+};
+
+const getFullArticle = async (req, res) => {
+  console.log("進入取得完整文章api");
+  const articleId = req.params.id;
+  const cacheKey = `article:${articleId}`;
+  // console.log("取得cacheKey", cacheKey);
+  try {
+    // 嘗試從 Redis 中獲取緩存數據
+    const cachedArticle = await redisClient.get(cacheKey);
+    if (cachedArticle) {
+      const article = JSON.parse(cachedArticle);
+      article.isFromCache = true;
+      return res.json(article);
+    }
+
+    // 從資料庫獲取數據
+    const article = await Article.findById(articleId)
+      .populate("author", "name")
+      .populate("board", "name");
+
+    if (!article) {
+      return res.status(404).json({ message: "文章未找到" });
+    }
+    console.log("後端取得完整文章", article);
+    article.isFromCache = false;
+    // 將數據存儲到 Redis，設置緩存時間（ 1 小時）
+    await redisClient.set(cacheKey, JSON.stringify(article), {
+      EX: 3600,
+    });
+
+    res.json(article);
+  } catch (e) {
+    res.status(500).json({ message: "無法獲取文章", e });
+  }
+};
+
 const createArticle = async (req, res) => {
   try {
     const { title, content, author, board } = req.body;
@@ -187,6 +187,12 @@ const createArticle = async (req, res) => {
     });
     await newArticle.save();
     console.log("已成功儲存到資料庫", newArticle);
+
+    // 清除文章列表的缓存
+    // await deleteKeysByPattern("articlesPreview:*");
+    await redisClient.del("articlesPreview");
+    console.log("createArticle清理緩存");
+
     res.status(200).json(newArticle);
   } catch (e) {
     res.status(500).json({ message: "無法創建文章", e });
@@ -195,7 +201,8 @@ const createArticle = async (req, res) => {
 
 const deleteArticle = async (req, res) => {
   try {
-    const article = await Article.findById(req.params.id);
+    const articleId = req.params.id;
+    const article = await Article.findById(articleId);
     console.log("資料庫找到文章", article);
     if (!article) {
       return res.status(404).json({ message: "文章未找到" });
@@ -203,8 +210,12 @@ const deleteArticle = async (req, res) => {
     if (article.author._id.toString() !== req.userId) {
       return res.status(403).json({ message: "無權刪除文章" });
     }
-    await Article.findByIdAndRemove(req.params.id);
-    console.log("刪除成功");
+    await Article.findByIdAndRemove(articleId);
+
+    // 清除这篇文章的缓存
+    await redisClient.del(`article:${articleId}`);
+    console.log("文章缓存已清除");
+
     res.status(200).json({ message: "文章已刪除" });
   } catch (e) {
     console.error(e.stack);
@@ -232,6 +243,10 @@ const updateArticle = async (req, res) => {
     article.board = board;
 
     const updatedArticle = await article.save();
+
+    // 清除這篇文章的緩存
+    await redisClient.del(`article:${id}`);
+
     res.status(200).json(updatedArticle);
     console.log("文章修改成功");
   } catch (e) {
@@ -256,13 +271,59 @@ const likeArticle = async (req, res) => {
       article.likes.push(userId);
     }
 
-    await article.save();
+    const updatedArticle = await article.save();
     console.log("後端成功點擊該文章喜歡", article);
-    res.status(200).json(article);
+
+    // 更新 Redis 缓存
+    const cacheKey = `article:${id}`;
+    const cachedArticle = await redisClient.get(cacheKey);
+    if (cachedArticle) {
+      // 如果缓存中有文章，只更新点赞信息
+      const updatedCacheArticle = JSON.parse(cachedArticle);
+      updatedCacheArticle.likes = article.likes;
+
+      // 将更新后的文章数据存回 Redis 缓存
+      await redisClient.set(cacheKey, JSON.stringify(updatedCacheArticle), {
+        EX: 3600, // 设置缓存过期时间，例如 1 小时
+      });
+      console.log("成功更新 Redis 缓存");
+    }
+
+    res.status(200).json(updatedArticle);
   } catch (e) {
     res.status(500).json({ message: "处理点赞时出现错误", e });
   }
 };
+
+// 删除匹配模式的键的辅助函数
+// async function deleteKeysByPattern(pattern) {
+//   console.log("进入 deleteKeysByPattern");
+//   let cursor = "0";
+//   do {
+//     try {
+//       const reply = await redisClient.scan(
+//         cursor,
+//         "MATCH",
+//         pattern,
+//         "COUNT",
+//         1000 // 增加 COUNT 值
+//       );
+
+//       cursor = reply.cursor;
+//       const keys = reply.keys;
+
+//       if (keys.length > 0) {
+//         console.log("Deleting keys:", keys);
+//         await redisClient.del(keys);
+//       } else {
+//         console.log("No keys found for pattern, continuing scan.");
+//       }
+//     } catch (err) {
+//       console.error("Error in deleteKeysByPattern:", err);
+//       throw err;
+//     }
+//   } while (cursor !== "0");
+// }
 
 module.exports = {
   getAllBoards,
