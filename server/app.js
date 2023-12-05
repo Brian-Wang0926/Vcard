@@ -25,7 +25,7 @@ const mongooseUri =
   process.env.MONGODB_URI || "mongodb://localhost:27017/Vcard";
 
 mongoose
-  .connect(mongooseUri)
+  .connect(mongooseUri, { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => {
     console.log("連結到mongodb...");
   })
