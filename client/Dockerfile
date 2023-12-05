@@ -26,5 +26,7 @@ FROM nginx:alpine
 # 复制构建的静态文件到Nginx容器的服务目录
 COPY --from=build /usr/src/app/build/ /usr/share/nginx/html
 
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+
 EXPOSE 80
 CMD ["nginx", "-g", "daemon off;"]
