@@ -7,7 +7,9 @@ async function consumeMessage(queue, callback) {
     const connection = await amqp.connect(
       process.env.RABBITMQ_URL || "amqp://localhost"
     );
+    console.log("consumeMessage connection", connection);
     const channel = await connection.createChannel();
+    console.log("consumeMessage channel", channel);
     await channel.assertQueue(queue, { durable: false });
 
     channel.consume(queue, (message) => {
@@ -17,6 +19,7 @@ async function consumeMessage(queue, callback) {
         callback(content);
         channel.ack(message);
       }
+      console.log("consumeMessage ")
     });
   } catch (error) {
     console.error("Error in RabbitMQ consumeMessage:", error);
