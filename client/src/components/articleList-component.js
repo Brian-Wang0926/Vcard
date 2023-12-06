@@ -24,7 +24,8 @@ const ArticleListComponent = ({
 
   const { currentUser } = useUserStore();
   const { savedArticles } = useUserStore.getState();
-  const { notificationSelectedArticleId } = useNotificationStore();
+  const { notificationSelectedArticleId, clearNotificationSelectedArticleId } =
+    useNotificationStore();
 
   const fetchArticles = useCallback(
     async (reset = false) => {
@@ -92,6 +93,7 @@ const ArticleListComponent = ({
   useEffect(() => {
     if (notificationSelectedArticleId) {
       setSelectedArticleId(notificationSelectedArticleId);
+      clearNotificationSelectedArticleId();
     }
   }, [notificationSelectedArticleId]);
 

@@ -18,7 +18,10 @@ const useNotificationStore = create((set) => ({
     set({ notifications: [] });
   },
   notificationSelectedArticleId: null,
-  setNotificationSelectedArticleId: (id) => set({ notificationSelectedArticleId: id }),
+  setNotificationSelectedArticleId: (id) =>
+    set({ notificationSelectedArticleId: id }),
+  clearNotificationSelectedArticleId: () =>
+    set({ notificationSelectedArticleId: null }),
 }));
 
 export default useNotificationStore;
