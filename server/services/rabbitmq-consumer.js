@@ -4,6 +4,7 @@ dotenv.config();
 
 async function consumeMessage(queue, callback) {
   try {
+    console.log("consumeMessage", process.env.RABBITMQ_URL);
     const connection = await amqp.connect(
       process.env.RABBITMQ_URL || "amqp://localhost"
     );
@@ -19,7 +20,7 @@ async function consumeMessage(queue, callback) {
         callback(content);
         channel.ack(message);
       }
-      console.log("consumeMessage ")
+      console.log("consumeMessage ");
     });
   } catch (error) {
     console.error("Error in RabbitMQ consumeMessage:", error);
