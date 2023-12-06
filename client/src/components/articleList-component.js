@@ -6,6 +6,7 @@ import Article from "./Article";
 import useUserStore from "../stores/userStore";
 import { fetchSavedArticles } from "../utils/sharedFunctions";
 import { ReactComponent as ArrowUpIcon } from "../icons/top_arrow.svg";
+import useNotificationStore from "../stores/notificationStore";
 
 const ArticleListComponent = ({
   board,
@@ -23,6 +24,7 @@ const ArticleListComponent = ({
 
   const { currentUser } = useUserStore();
   const { savedArticles } = useUserStore.getState();
+  const { notificationSelectedArticleId } = useNotificationStore();
 
   const fetchArticles = useCallback(
     async (reset = false) => {
@@ -32,7 +34,7 @@ const ArticleListComponent = ({
       }
 
       setLoading(true);
-      // 获取保存的文章 ID
+
       try {
         let params = new URLSearchParams({
           limit: 6,
@@ -44,6 +46,7 @@ const ArticleListComponent = ({
         } else if (showOnlyUserArticles && currentUser?.id) {
           params.append("authorId", currentUser.id);
         } else if (showOnlySavedArticles) {
+          console.log("進入showOnlySavedArticles");
           params.append("savedArticleIds", Array.from(savedArticles).join(","));
         }
 
@@ -85,6 +88,12 @@ const ArticleListComponent = ({
       showOnlyUserArticles,
     ]
   );
+
+  useEffect(() => {
+    if (notificationSelectedArticleId) {
+      setSelectedArticleId(notificationSelectedArticleId);
+    }
+  }, [notificationSelectedArticleId]);
 
   useEffect(() => {
     console.log("開始");

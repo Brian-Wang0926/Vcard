@@ -9,4 +9,8 @@ router.put("/save-article", authMiddleware, profileController.saveArticle);
 
 router.get("/save-article", authMiddleware, profileController.getSaveArticle);
 
+router.post("/subscribe", authMiddleware, profileController.subscribeBoard);
+
+router.get("/subscribe", authMiddleware, profileController.getSubscribedBoards);
+
 module.exports = router;

@@ -1,10 +1,53 @@
-import React from "react";
+import React, { useEffect } from "react";
+import useUserStore from "../stores/userStore";
+import starGray from "../icons/star_gray.svg";
+import starBlue from "../icons/star_blue.svg";
+import authServiceInstance from "../services/auth-service";
+import axios from "axios";
 
 const BoardListComponent = ({ boards, setSelectedBoard }) => {
+  const { subscribedBoards, toggleSubscribedBoard } = useUserStore();
 
   const handleBoardClick = (board) => {
     setSelectedBoard(board);
   };
+
+  const handleSubscribeClick = async (boardId, e) => {
+    e.stopPropagation(); // 防止触发 handleBoardClick
+    try {
+      const response = await axios.post(
+        `${process.env.REACT_APP_API_URL}/api/profile/subscribe`,
+        { boardId },
+        { headers: authServiceInstance.authHeader() }
+      );
+
+      if (response.status === 200) {
+        toggleSubscribedBoard(boardId);
+      }
+    } catch (error) {
+      console.error("Error subscribing to board:", error);
+    }
+  };
+
+  useEffect(() => {
+    const fetchSubscriptions = async () => {
+      try {
+        const response = await axios.get(
+          `${process.env.REACT_APP_API_URL}/api/profile/subscribe`,
+          { headers: authServiceInstance.authHeader() }
+        );
+        console.log("發api取得訂閱看版", response);
+        if (response.status === 200) {
+          console.log("取得訂閱看版資料", response.data);
+          useUserStore.setState({ subscribedBoards: new Set(response.data) });
+        }
+      } catch (error) {
+        console.error("获取订阅状态时发生错误:", error);
+      }
+    };
+
+    fetchSubscriptions();
+  }, []);
 
   if (!boards.length) {
     return <div>Loading...</div>;
@@ -17,11 +60,20 @@ const BoardListComponent = ({ boards, setSelectedBoard }) => {
         <div
           key={board._id}
           onClick={() => handleBoardClick(board)}
-          className="cursor-pointer hover:bg-blue-700 p-2 rounded transition-colors duration-200 ease-in-out"
+          className="flex justify-between items-center cursor-pointer hover:bg-blue-700 p-2 rounded transition-colors duration-200 ease-in-out"
         >
-          <div>
-            {board.icon} {board.name}
+          <div className="flex items-center">
+            {board.icon} <span className="ml-2">{board.name}</span>
           </div>
+          <img
+            src={subscribedBoards.has(board._id) ? starBlue : starGray}
+            alt="Subscribe"
+            className="cursor-pointer"
+            onClick={(e) => {
+              e.stopPropagation(); // 防止触发 handleBoardClick
+              handleSubscribeClick(board._id, e);
+            }}
+          />
         </div>
       ))}
     </div>

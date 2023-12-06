@@ -54,6 +54,12 @@ const userSchema = new Schema({
       ref: "User",
     },
   ],
+  subscribedBoards: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Board",
+    },
+  ],
 });
 
 module.exports = mongoose.model("User", userSchema);

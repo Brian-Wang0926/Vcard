@@ -130,7 +130,7 @@ const PostComponent = ({ boards }) => {
       alert("請填寫文章標題");
       return;
     }
-    
+
     if (!content.trim()) {
       alert("請填寫文章內容");
       return;
@@ -162,7 +162,7 @@ const PostComponent = ({ boards }) => {
       content: updatedContent,
       author: currentUser?.id,
     };
-
+    console.log("看板", selectedBoard);
     console.log("Article Data: ", articleData);
     // 发送 POST 请求到后端
     try {

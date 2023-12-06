@@ -1,6 +1,8 @@
 const Article = require("../models/article-model");
 const Board = require("../models/board-model");
+const User = require("../models/user-model");
 const redisClient = require("../redis-client");
+const rabbitMQService = require("../services/rabbitmq-service");
 const dotenv = require("dotenv");
 dotenv.config();
 
@@ -97,8 +99,19 @@ const getPartArticles = async (req, res) => {
     if (req.query.authorId) {
       query.author = req.query.authorId;
     }
-    if (req.query.savedArticleIds) {
-      query._id = { $in: req.query.savedArticleIds.split(",") };
+    // 检查是否存在 savedArticleIds 参数
+    if ("savedArticleIds" in req.query) {
+      const savedArticleIds = req.query.savedArticleIds.split(",");
+      console.log("啥", savedArticleIds);
+      if (savedArticleIds.length === 0 || savedArticleIds[0] === "") {
+        console.log("沒有收藏");
+        return res.json([]);
+      }
+      query._id = { $in: savedArticleIds };
+      console.log("有收藏");
+    } else {
+      console.log("savedArticleIds 未提供");
+      // 这里可以根据需要处理当 savedArticleIds 参数未提供的情况
     }
 
     const limit = parseInt(req.query.limit) || 6;
@@ -128,7 +141,7 @@ const getPartArticles = async (req, res) => {
         isFromCache: false,
       };
     });
-    console.log("資料庫取得預覽文章", articlesPreview);
+    console.log("資料庫取得預覽文章");
 
     // 將數據存儲到 Redis，設置緩存時間（ 1 小時）
     // await redisClient.set(cacheKey, JSON.stringify(articlesPreview), {
@@ -186,12 +199,28 @@ const createArticle = async (req, res) => {
       board,
     });
     await newArticle.save();
-    console.log("已成功儲存到資料庫", newArticle);
+    console.log("已成功儲存到資料庫", newArticle._id);
 
     // 清除文章列表的缓存
-    // await deleteKeysByPattern("articlesPreview:*");
-    await redisClient.del("articlesPreview");
-    console.log("createArticle清理緩存");
+    // await redisClient.del("articlesPreview:*");
+    // console.log("createArticle清理緩存");
+
+    // 获取看板名称
+    const boardData = await Board.findById(board);
+    const boardName = boardData ? boardData.name : "";
+
+    // 查找订阅了这个看板的所有用户
+    const subscribedUsers = await User.find({ subscribedBoards: board });
+    console.log("Subscribed users:", subscribedUsers);
+
+    // 对每个用户发送通知消息
+    subscribedUsers.forEach((user) => {
+      rabbitMQService.sendMessage("notify_queue", {
+        userId: user._id,
+        articleId: newArticle._id,
+        message: `New post "${title}" in your subscribed board: ${boardName}`,
+      });
+    });
 
     res.status(200).json(newArticle);
   } catch (e) {
