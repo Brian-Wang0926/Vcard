@@ -6,7 +6,8 @@ import authServiceInstance from "../services/auth-service";
 import axios from "axios";
 
 const BoardListComponent = ({ boards, setSelectedBoard }) => {
-  const { subscribedBoards, toggleSubscribedBoard } = useUserStore();
+  const { subscribedBoards, toggleSubscribedBoard, authChecked } =
+    useUserStore();
 
   const handleBoardClick = (board) => {
     setSelectedBoard(board);
@@ -30,24 +31,27 @@ const BoardListComponent = ({ boards, setSelectedBoard }) => {
   };
 
   useEffect(() => {
-    const fetchSubscriptions = async () => {
-      try {
-        const response = await axios.get(
-          `${process.env.REACT_APP_API_URL}/api/profile/subscribe`,
-          { headers: authServiceInstance.authHeader() }
-        );
-        console.log("發api取得訂閱看版", response);
-        if (response.status === 200) {
-          console.log("取得訂閱看版資料", response.data);
-          useUserStore.setState({ subscribedBoards: new Set(response.data) });
+    if (authChecked) {
+      const fetchSubscriptions = async () => {
+        try {
+          console.log("fetchSubscriptions", authServiceInstance.authHeader());
+          const response = await axios.get(
+            `${process.env.REACT_APP_API_URL}/api/profile/subscribe`,
+            { headers: authServiceInstance.authHeader() }
+          );
+          console.log("發api取得訂閱看版", response);
+          if (response.status === 200) {
+            console.log("取得訂閱看版資料", response.data);
+            useUserStore.setState({ subscribedBoards: new Set(response.data) });
+          }
+        } catch (error) {
+          console.error("获取订阅状态时发生错误:", error);
         }
-      } catch (error) {
-        console.error("获取订阅状态时发生错误:", error);
-      }
-    };
+      };
 
-    fetchSubscriptions();
-  }, []);
+      fetchSubscriptions();
+    }
+  }, [authChecked]);
 
   if (!boards.length) {
     return <div>Loading...</div>;

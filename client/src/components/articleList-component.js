@@ -95,7 +95,7 @@ const ArticleListComponent = ({
       setSelectedArticleId(notificationSelectedArticleId);
       clearNotificationSelectedArticleId();
     }
-  }, [notificationSelectedArticleId]);
+  }, [notificationSelectedArticleId, clearNotificationSelectedArticleId]);
 
   useEffect(() => {
     console.log("開始");

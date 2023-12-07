@@ -34,7 +34,7 @@ const LoginComponent = () => {
         localStorage.setItem("user", JSON.stringify(response.data));
         setCurrentUser(response.data);
         console.log("模擬登入成功", response.data);
-        navigate("/profile");
+        navigate("/");
       }
     } catch (error) {
       console.error("模擬登入失敗:", error);
