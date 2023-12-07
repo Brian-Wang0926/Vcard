@@ -1,18 +1,26 @@
 const amqp = require("amqplib");
 
 async function sendMessage(queue, message) {
-  const connection = await amqp.connect(
-    process.env.RABBITMQ_URL || "amqp://localhost"
-  ); // 连接到RabbitMQ服务器
-  const channel = await connection.createChannel(); // 创建通道
-  await channel.assertQueue(queue, { durable: false }); // 确保队列存在
+  let connection;
+  let channel;
+  
+  try {
+    connection = await amqp.connect(process.env.RABBITMQ_URL || "amqp://localhost");
+    channel = await connection.createChannel();
+    await channel.assertQueue(queue, { durable: false });
 
-  console.log("Sending message to queue:", queue, message);
-  channel.sendToQueue(queue, Buffer.from(JSON.stringify(message))); // 发送消息
-
-  setTimeout(() => {
-    connection.close();
-  }, 500);
+    console.log("Sending message to queue:", queue, message);
+    channel.sendToQueue(queue, Buffer.from(JSON.stringify(message)));
+  } catch (error) {
+    console.error("Error sending message to RabbitMQ:", error);
+    // 实施重试逻辑或发出警告
+  } finally {
+    if (channel) {
+      await channel.close();
+    }
+    if (connection) {
+      await connection.close();
+    }
+  }
 }
-
 module.exports = { sendMessage };

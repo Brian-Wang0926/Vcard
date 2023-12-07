@@ -32,6 +32,7 @@ const BoardListComponent = ({ boards, setSelectedBoard }) => {
 
   useEffect(() => {
     if (authChecked) {
+      console.log("檢查authChecked", authChecked);
       const fetchSubscriptions = async () => {
         try {
           console.log("fetchSubscriptions", authServiceInstance.authHeader());

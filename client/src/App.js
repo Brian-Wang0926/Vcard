@@ -21,8 +21,8 @@ function App() {
     const storedUser = authServiceInstance.getCurrentUser(); // 从 localStorage 获取用户数据
     if (storedUser) {
       setCurrentUser(storedUser); // 更新 Zustand store
+      setAuthChecked(true);
     }
-    setAuthChecked(true);
   }, [setCurrentUser, setAuthChecked]);
 
   useEffect(() => {
