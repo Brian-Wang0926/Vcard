@@ -28,8 +28,6 @@ io.on("connection", (socket) => {
 
   // 聊天功能處理
   chatSocketHandler(socket, io);
-
-  // 其他功能，如需要
 });
 
 const PORT = process.env.PORT;

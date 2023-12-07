@@ -10,6 +10,7 @@ import ChatIcon from "../icons/8664935_message_chat_communication_icon.svg";
 import ProfileIcon from "../icons/8664831_user_icon.svg";
 import NotifyIcon from "../icons/8664802_bell_icon.svg";
 import NotificationsComponent from "./notifications-component";
+import SearchBar from "./searchBar";
 
 const NavComponent = () => {
   const { currentUser, setCurrentUser } = useUserStore();
@@ -74,6 +75,7 @@ const NavComponent = () => {
             >
               Vcard
             </a>
+            <SearchBar />
             <ul className="flex space-x-4">
               {currentUser && (
                 <li className="nav-item">

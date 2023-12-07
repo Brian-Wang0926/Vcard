@@ -16,25 +16,31 @@ const NotificationsComponent = () => {
 
   return (
     <div className="absolute top-full right-0 mt-2 py-2 w-96 bg-white  rounded-lg shadow-2xl">
-      {reversedNotifications.length === 0 ? (
-        <div className="px-4 py-2 text-gray-700"> No Notifications</div>
-      ) : (
-        reversedNotifications.map((notification, index) => (
-          <div
-            key={index}
-            className="px-4 py-2 my-2 text-gray-700 hover:bg-gray-200 cursor-pointer "
-            onClick={() => handleNotificationClick(notification)}
+      <div className="flex flex-col justify-between h-full">
+        <div>
+          {reversedNotifications.length === 0 ? (
+            <div className="px-4 py-2 text-gray-700"> No Notifications</div>
+          ) : (
+            reversedNotifications.map((notification, index) => (
+              <div
+                key={index}
+                className="px-4 py-2 my-2 text-gray-700 hover:bg-gray-200 cursor-pointer "
+                onClick={() => handleNotificationClick(notification)}
+              >
+                {notification.message}
+              </div>
+            ))
+          )}
+        </div>
+        <div className="flex justify-end px-4">
+          <button
+            onClick={clearNotifications}
+            className="bg-blue-500 hover:bg-blue-700 text-white font-bold p-1 rounded ml-4 text-xs"
           >
-            {notification.message}
-          </div>
-        ))
-      )}
-      <button
-        onClick={clearNotifications}
-        className="bg-blue-500 hover:bg-blue-700 text-white font-bold p-1 rounded ml-4 text-xs"
-      >
-        clear
-      </button>
+            clear
+          </button>
+        </div>
+      </div>
     </div>
   );
 };
