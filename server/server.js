@@ -28,6 +28,13 @@ io.on("connection", (socket) => {
 
   // 聊天功能處理
   chatSocketHandler(socket, io);
+
+  socket.on("disconnect", (reason) => {
+    if (reason === "transport close" || reason === "ping timeout") {
+      console.log("Lost network connection");
+      // 在這裡處理網絡斷開的情況
+    }
+  });
 });
 
 const PORT = process.env.PORT;

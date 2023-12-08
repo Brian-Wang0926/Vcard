@@ -21,7 +21,10 @@ function App() {
     const storedUser = authServiceInstance.getCurrentUser(); // 从 localStorage 获取用户数据
     if (storedUser) {
       setCurrentUser(storedUser); // 更新 Zustand store
-      setAuthChecked(true);
+      setAuthChecked(true); // 用户已登录，设置 authChecked 为 true
+      console.log("設定setCurrentUser及setAuthChecked為true");
+    } else {
+      setAuthChecked(false); // 用户未登录，设置 authChecked 为 false
     }
   }, [setCurrentUser, setAuthChecked]);
 

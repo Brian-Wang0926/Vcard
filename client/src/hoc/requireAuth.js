@@ -6,6 +6,7 @@ const RequireAuth = ({ children }) => {
   const { currentUser, authChecked } = useUserStore();
 
   if (!authChecked) {
+    console.log("authChecked", authChecked);
     return null; // 或者返回一个加载组件
   }
 

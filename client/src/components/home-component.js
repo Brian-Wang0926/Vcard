@@ -3,6 +3,7 @@ import { useSearchParams } from "react-router-dom";
 import BoardListComponent from "./boardList-component";
 import ArticleListComponent from "./articleList-component";
 import useUserStore from "../stores/userStore";
+import authService from "../services/auth-service";
 
 function HomeComponent({ boards, setBoards }) {
   const [searchParams] = useSearchParams();
@@ -10,15 +11,15 @@ function HomeComponent({ boards, setBoards }) {
   const { currentUser, setCurrentUser } = useUserStore();
 
   useEffect(() => {
-    const token = searchParams.get("token");
+    const currentUser = authService.getCurrentUser();
+    setCurrentUser(currentUser); // 设置当前用户，如果用户未登录或令牌无效则为 null
 
+    const token = searchParams.get("token");
     if (token) {
       const name = searchParams.get("name");
       const id = searchParams.get("id");
       const userObj = { token: token, name: name, id: id };
       localStorage.setItem("user", JSON.stringify(userObj));
-      console.log("已將token存進localStorage");
-
       setCurrentUser(userObj);
     }
   }, [searchParams, setCurrentUser]);

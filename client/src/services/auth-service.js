@@ -1,4 +1,5 @@
 import axios from "axios";
+import { jwtDecode } from "jwt-decode";
 
 class AuthService {
   authHeader() {
@@ -16,8 +17,22 @@ class AuthService {
 
   getCurrentUser() {
     const user = JSON.parse(localStorage.getItem("user"));
-    console.log("CurrentUser為：", user);
-    return user ? user : null;
+    console.log("getCurrentUser", user);
+    if (user && this.isTokenValid(user.token)) {
+      return user;
+    } else {
+      this.logout(); // 清除无效或过期的用户信息
+      return null;
+    }
+  }
+
+  isTokenValid(token) {
+    try {
+      const decodedToken = jwtDecode(token);
+      return decodedToken.exp * 1000 > Date.now();
+    } catch (error) {
+      return false; // 解析失败，视为无效Token
+    }
   }
 
   getUserProfile() {
