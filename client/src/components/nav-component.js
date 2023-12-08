@@ -21,7 +21,11 @@ const NavComponent = () => {
 
   useEffect(() => {
     if (currentUser && currentUser.id) {
-      const socket = socketIOClient(process.env.REACT_APP_API_URL);
+      const socket = socketIOClient(process.env.REACT_APP_API_URL, {
+        reconnectionAttempts: 5, // 重连尝试次数
+        reconnectionDelay: 10000, // 重连延迟时间（毫秒）
+      });
+      
       socket.on("connect", () => {
         socket.emit("register", currentUser.id);
       });

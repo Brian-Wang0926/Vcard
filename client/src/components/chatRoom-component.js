@@ -10,7 +10,12 @@ const ChatRoomComponent = (props) => {
   const { currentUser } = useUserStore();
 
   const chatContainerRef = useRef(null);
-  const socket = useRef(socketIOClient(process.env.REACT_APP_API_URL));
+  const socket = useRef(
+    socketIOClient(process.env.REACT_APP_API_URL, {
+      reconnectionAttempts: 5, // 重连尝试次数
+      reconnectionDelay: 10000, // 重连延迟时间（毫秒）
+    })
+  );
 
   useEffect(() => {
     // 當好友被選中，從後端取得聊天紀錄
@@ -98,9 +103,7 @@ const ChatRoomComponent = (props) => {
           <div
             key={index}
             className={`${
-              msg.fromUserId === currentUser.id
-                ? "flex justify-end"
-                : "flex"
+              msg.fromUserId === currentUser.id ? "flex justify-end" : "flex"
             }`}
           >
             {msg.fromUserId !== currentUser.id && (
