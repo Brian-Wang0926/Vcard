@@ -2,6 +2,7 @@ import { create } from "zustand";
 
 const getStoredNotifications = () => {
   const stored = localStorage.getItem("notifications");
+  console.log("zus從localStorage取得notifications")
   return stored ? JSON.parse(stored) : [];
 };
 
@@ -11,6 +12,7 @@ const useNotificationStore = create((set) => ({
     set((state) => {
       const newNotifications = [...state.notifications, notification];
       localStorage.setItem("notifications", JSON.stringify(newNotifications));
+      console.log("zus從localStorage建立notifications")
       return { notifications: newNotifications };
     }),
   clearNotifications: () => {

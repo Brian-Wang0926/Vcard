@@ -95,7 +95,7 @@ const getSubscribedBoards = async (req, res) => {
 
     // 假设我们只返回订阅看板的ID数组
     const subscribedBoardIds = user.subscribedBoards.map((board) => board._id);
-    console.log("後端取得", subscribedBoardIds);
+    console.log("後端取得訂閱看版");
     res.status(200).json(subscribedBoardIds);
   } catch (error) {
     console.error("获取订阅状态时发生错误:", error);

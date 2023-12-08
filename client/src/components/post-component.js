@@ -91,13 +91,19 @@ const PostComponent = ({ boards }) => {
     try {
       console.log("前端上傳到s3", file);
       console.log("Uploading to S3, file type:", file.type, "size:", file.size);
+      console.log("檔名", file.name);
+      const extension = file.name.split(".").pop();
+
+      const randomFileName = `${Date.now()}-${Math.random()
+        .toString(36)
+        .slice(2, 15)}.${extension}`;
 
       // 使用 axios 獲取預簽名 URL
       const response = await axios.get(
         `${process.env.REACT_APP_API_URL}/api/article/getPresignedUrl`,
         {
           params: {
-            fileName: encodeURIComponent(file.name),
+            fileName: randomFileName,
             fileType: encodeURIComponent(file.type),
           },
         }
@@ -113,7 +119,7 @@ const PostComponent = ({ boards }) => {
       });
 
       // 构造并返回 CloudFront URL
-      const cloudFrontUrl = `${process.env.REACT_APP_CLOUDFRONT_URL}/${file.name}`;
+      const cloudFrontUrl = `${process.env.REACT_APP_CLOUDFRONT_URL}/${randomFileName}`;
       console.log("CloudFront URL", cloudFrontUrl);
       return cloudFrontUrl;
     } catch (error) {

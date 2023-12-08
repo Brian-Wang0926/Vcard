@@ -210,6 +210,7 @@ const createArticle = async (req, res) => {
     const boardName = boardData ? boardData.name : "";
 
     // 查找订阅了这个看板的所有用户
+    // 是抓所有資料，是否抓id就好
     const subscribedUsers = await User.find({ subscribedBoards: board });
     console.log("Subscribed users:", subscribedUsers);
 
@@ -220,6 +221,7 @@ const createArticle = async (req, res) => {
         articleId: newArticle._id,
         message: `New post "${title}" in your subscribed board: ${boardName}`,
       });
+      console.log("從createArticle發出rabbitMQ")
     });
 
     res.status(200).json(newArticle);

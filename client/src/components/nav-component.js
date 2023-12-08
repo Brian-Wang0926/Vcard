@@ -10,7 +10,7 @@ import ChatIcon from "../icons/8664935_message_chat_communication_icon.svg";
 import ProfileIcon from "../icons/8664831_user_icon.svg";
 import NotifyIcon from "../icons/8664802_bell_icon.svg";
 import NotificationsComponent from "./notifications-component";
-import SearchBar from "./searchBar";
+// import SearchBar from "./searchBar";
 
 const NavComponent = () => {
   const { currentUser, setCurrentUser } = useUserStore();
@@ -31,7 +31,7 @@ const NavComponent = () => {
       });
 
       socket.on("newNotification", (message) => {
-        console.log("message顯示", message);
+        console.log("newNotification顯示message", message);
         addNotification(message);
       });
 
@@ -79,7 +79,7 @@ const NavComponent = () => {
             >
               Vcard
             </a>
-            <SearchBar />
+            {/* <SearchBar /> */}
             <ul className="flex space-x-4">
               {currentUser && (
                 <li className="nav-item">

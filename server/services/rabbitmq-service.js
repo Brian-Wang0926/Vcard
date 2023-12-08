@@ -8,6 +8,7 @@ async function connectRabbitMQ() {
       process.env.RABBITMQ_URL || "amqp://localhost"
     );
     channel = await connection.createChannel();
+    console.log("connectRabbitMQ", connection, channel);
   } catch (error) {
     console.error("Error connecting to RabbitMQ:", error);
     // 实施重试逻辑或发出警告
