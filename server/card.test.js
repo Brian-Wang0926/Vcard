@@ -2,6 +2,7 @@
 jest.setTimeout(60000);
 
 const request = require("supertest");
+const http = require("http");
 const app = require("./app");
 const User = require("./models/user-model");
 const Card = require("./models/card-model");
@@ -10,17 +11,34 @@ const mongooseUri =
   process.env.MONGODB_URI || "mongodb://localhost:27017/Vcard";
 const { performance } = require("perf_hooks");
 let server;
+const cardController = require("./controllers/card-controller");
 
 describe("Card Pairing", () => {
   // 在所有測試開始前，建立數據庫連接
   beforeAll(async () => {
-
     await mongoose.connect(mongooseUri, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
     });
-    server = app.listen(0);
+    server = http.createServer(app).listen(0);
+    console.log("成功連結");
   });
+
+  beforeEach(async () => {
+    await User.deleteMany({});
+    await Card.deleteMany({});
+    console.log("成功刪除");
+  });
+
+  beforeEach(() => {
+    jest.useFakeTimers("modern"); // 使用现代的定时器模拟
+  });
+
+  afterEach(() => {
+    jest.useRealTimers();
+  });
+
+
   // 在每個測試案例執行前，建立模擬的使用者資料
   const createUser = async (num) => {
     const users = [];
@@ -31,6 +49,7 @@ describe("Card Pairing", () => {
         email: `test${i}@example.com`,
       });
     }
+    console.log("創建使用者", users);
     await User.insertMany(users);
   };
 
@@ -39,10 +58,9 @@ describe("Card Pairing", () => {
     await createUser(num);
 
     const start = performance.now();
-    const response = await request(app).get("/api/card/pairUsers");
+    await cardController.pairUsers();
     const end = performance.now();
-
-    expect(response.status).toBe(200);
+    console.log("配對結果完成");
 
     // 查詢Card資料表並驗證結果
     const cardResults = await Card.find({}); // 查詢所有的卡片
@@ -55,32 +73,36 @@ describe("Card Pairing", () => {
     console.log(`Time taken for pairing ${num} users: ${end - start}ms`);
   };
 
-  // it("should pair 100,000 users correctly", async () => {
-  //   await testPairing(100000);
+  // it("should pair 10 users correctly", async () => {
+  //   await testPairing(10);
   // }, 120000);
 
-  // it("should pair 100 users correctly", async () => {
-  //   await testPairing(100);
-  // }, 120000);
 
-  it("should pair 10 users correctly", async () => {
+  it("should set correct expiryDate and status on pairs", async () => {
     await testPairing(10);
+    const cards = await Card.find({});
+    cards.forEach((card) => {
+      expect(card.status).toBe(true); // 确保卡片的状态被正确设置
+      expect(new Date(card.expiryDate).getTime()).toBeGreaterThan(Date.now());
+    });
   }, 120000);
 
-  // it("should pair 9 users correctly", async () => {
-  //   await testPairing(9);
-  // }, 120000);
 
-  // it("should pair 0 users correctly", async () => {
-  //   await testPairing(0);
-  // }, 120000);
+  it("pairs should disappear after a day", async () => {
+    await testPairing(10);
+
+    // 快进时间到第二天
+    jest.setSystemTime(new Date("2023-01-02T00:00:00Z"));
+
+    const response = await request(server).get("/api/card/getPairs");
+    expect(response.status).toBe(200);
+    expect(response.body.length).toBe(0);
+  }, 120000);
 
   afterAll(async () => {
     // await User.deleteMany({});
     // await Card.deleteMany({});
     await new Promise((resolve) => server.close(resolve)); // 修改這裡，使用Promise確保server已經完全關閉
     await mongoose.connection.close();
-    // console.log("檢查打開的句柄...");
-    // logOpenHandles();
   });
 });

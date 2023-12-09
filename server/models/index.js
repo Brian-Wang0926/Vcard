@@ -3,5 +3,6 @@ module.exports = {
   card: require("./card-model"),
   chat: require("./chat-model"),
   article: require("./article-model"),
-  board:require("./board-model")
+  board: require("./board-model"),
+  comment: require("./comment-model")
 };

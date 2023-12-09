@@ -19,7 +19,7 @@ const chatRoute = require("./routes/chat-route");
 const profileRoute = require("./routes/profile-route");
 const articleRoute = require("./routes/article-route");
 const commentRoute = require("./routes/comment-route");
-const esClient = require("./elasticsearch-client");
+// const esClient = require("./elasticsearch-client");
 
 const mongoose = require("mongoose");
 const mongooseUri = process.env.MONGODB_URI;

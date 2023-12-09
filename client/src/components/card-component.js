@@ -38,16 +38,23 @@ const CardComponent = (props) => {
           { headers: authServiceInstance.authHeader() }
         );
         const cards = response.data;
-        const card = cards.find(
-          (card) => card.userID1._id === userId || card.userID2._id === userId
-        );
-        if (card) {
-          const pairedUserData =
-            card.userID1._id === userId ? card.userID2 : card.userID1;
-          setPairedUser(pairedUserData);
-          setCardId(card._id);
+        const currentDate = new Date();
+        const validCard = cards.find((card) => {
+          const isUserInvolved =
+            card.userID1._id === userId || card.userID2._id === userId;
+          const isCardActive =
+            new Date(card.expiryDate) > currentDate && card.status;
+          return isUserInvolved && isCardActive;
+        });
 
-          if (card.acceptedBy.includes(userId)) {
+        if (validCard) {
+          const pairedUserData =
+            validCard.userID1._id === userId
+              ? validCard.userID2
+              : validCard.userID1;
+          setPairedUser(pairedUserData);
+          setCardId(validCard._id);
+          if (validCard.acceptedBy.includes(userId)) {
             setInviteStatus("已發送");
           }
         }
@@ -61,9 +68,9 @@ const CardComponent = (props) => {
   return (
     <div className="max-w-screen-xl mx-auto mt-14 pt-14">
       {pairedUser ? (
-        <div className="flex flex-col items-center bg-gray-100 border border-gray-200 p-12 rounded-lg shadow-md w-72 mx-auto">
-          <h1 className="text-center my-2">{pairedUser.name}</h1>
-          <h3 className="text-center my-2">{pairedUser.email}</h3>
+        <div className="flex flex-col items-center bg-gray-100 border border-gray-200 p-12 rounded-lg shadow-md w-96 mx-auto">
+          <h1 className="text-center my-2 text-2xl">{pairedUser.name}</h1>
+          {/* <h3 className="text-center my-2">{pairedUser.email}</h3> */}
           <img
             src={pairedUser.thumbnail}
             alt="{pairedUser.name}"
@@ -78,7 +85,9 @@ const CardComponent = (props) => {
           </button>
         </div>
       ) : (
-        <p>Loading or no paired user found...</p>
+        <div className="flex flex-col items-center bg-gray-600 text-white border border-gray-200 p-12 rounded-lg shadow-md w-96 mx-auto">
+          <p>no paired user found...</p>
+        </div>
       )}
     </div>
   );

@@ -22,6 +22,7 @@ const checkEligibility = async (req, res) => {
         user.eligibleForCard = true;
         eligibleCount++;
       }
+      console.log("已完成抽卡資格名單");
 
       return {
         updateOne: {
@@ -39,6 +40,7 @@ const checkEligibility = async (req, res) => {
 
     // 如果有資格抽卡的人數是奇數，找出一個未獲得資格但最近活躍得用戶，给予抽卡資格
     if (eligibleCount % 2 !== 0) {
+      console.log("抽卡資格人數為奇數");
       const lastActiveIneligibleUser = await User.findOne({
         eligibleForCard: false,
       }).sort({ lastActiveDate: -1 });
@@ -58,11 +60,13 @@ const checkEligibility = async (req, res) => {
 
 const pairUsers = async (req, res) => {
   try {
+    console.log("開始配對");
     // 先列出所有符合抽卡資格的人
     const eligibleUsers = await User.find(
       { eligibleForCard: true },
       "_id cardsDrawn"
     );
+    console.log("有資格配對名單", eligibleUsers);
     const newCards = []; //保存新建的卡片，每一張卡片代表一組配對
     const updateUserPromises = []; //保存所有更新用戶資訊的異步操作
     const pairedUsersSet = new Set(); //一個集合(set)，用來追蹤已經配對的用戶
@@ -86,6 +90,11 @@ const pairUsers = async (req, res) => {
         newCards.push({
           userID1: userA._id,
           userID2: userB._id,
+        });
+
+        // 设置配对的失效时间
+        newCards.forEach((card) => {
+          card.expiryDate = new Date(Date.now() + 24 * 60 * 60 * 1000); // 设置为当前时间加24小时
         });
 
         userA.cardsDrawn.push(userB._id);
@@ -116,7 +125,6 @@ const pairUsers = async (req, res) => {
     await Card.insertMany(newCards);
     await Promise.all(updateUserPromises);
     console.log("已完成配對", newCards);
-
   } catch (e) {
     console.error("Error during pairing:", e);
     res.status(500).json({ message: "Internal server error." });
@@ -126,9 +134,11 @@ const pairUsers = async (req, res) => {
 const getPairs = async (req, res) => {
   try {
     const userId = req.userId;
+    const currentDate = new Date();
     console.log("getPairs", userId);
     const cards = await Card.find({
       $or: [{ userID1: userId }, { userID2: userId }],
+      expiryDate: { $gte: currentDate },
     }).populate("userID1 userID2");
     res.json(cards);
   } catch (e) {
@@ -172,9 +182,24 @@ const agreePairs = async (req, res) => {
   }
 };
 
+const clearExpiredPairs = async () => {
+  try {
+    const currentDate = new Date();
+    // 标记过期的配对为无效
+    await Card.updateMany(
+      { expiryDate: { $lt: currentDate } },
+      { $set: { status: false } }
+    );
+    console.log("已标记过期配对");
+  } catch (e) {
+    console.error("Error during marking expired pairs:", e);
+  }
+};
+
 module.exports = {
   checkEligibility,
   pairUsers,
   getPairs,
   agreePairs,
+  clearExpiredPairs,
 };

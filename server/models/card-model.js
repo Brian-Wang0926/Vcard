@@ -16,7 +16,8 @@ const cardSchema = new Schema({
     type: Date,
     default: Date.now,
   },
-  status: {   //是否配對成功( true 成功、false 失敗)
+  status: {
+    //是否配對成功( true 成功、false 失敗)
     type: Boolean,
     default: false,
   },
@@ -26,6 +27,10 @@ const cardSchema = new Schema({
       ref: "User",
     },
   ],
+  expiryDate: {
+    type: Date,
+    required: true,
+  },
 });
 
 module.exports = mongoose.model("Card", cardSchema);

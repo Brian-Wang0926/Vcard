@@ -11,6 +11,9 @@ cron.schedule("59 23 * * *", () => {
     .then(() => {
       cardController.pairUsers();
     })
+    .then(() => {
+      cardController.clearExpiredPairs(); // 新增
+    })
     .catch((error) => {
       console.error("Error during cron job:", error);
     });
