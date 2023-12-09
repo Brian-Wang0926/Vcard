@@ -16,8 +16,8 @@ const NotificationsComponent = () => {
 
   return (
     <div className="absolute top-full right-0 mt-2 py-2 w-96 bg-white  rounded-lg shadow-2xl">
-      <div className="flex flex-col justify-between h-full">
-        <div>
+      <div className="flex flex-col justify-between h-[75vh]">
+        <div className="overflow-y-auto">
           {reversedNotifications.length === 0 ? (
             <div className="px-4 py-2 text-gray-700"> No Notifications</div>
           ) : (
@@ -35,7 +35,7 @@ const NotificationsComponent = () => {
         <div className="flex justify-end px-4">
           <button
             onClick={clearNotifications}
-            className="bg-blue-500 hover:bg-blue-700 text-white font-bold p-1 rounded ml-4 text-xs"
+            className="bg-blue-500 hover:bg-blue-700 text-white font-bold p-1 mt-2 rounded ml-4 text-xs"
           >
             clear
           </button>
