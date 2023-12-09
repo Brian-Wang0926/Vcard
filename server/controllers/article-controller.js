@@ -212,7 +212,7 @@ const createArticle = async (req, res) => {
     // 查找订阅了这个看板的所有用户
     // 是抓所有資料，是否抓id就好
     const subscribedUsers = await User.find({ subscribedBoards: board });
-    console.log("Subscribed users:", subscribedUsers);
+    console.log("Subscribed users:");
 
     // 对每个用户发送通知消息
     subscribedUsers.forEach((user) => {

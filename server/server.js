@@ -16,6 +16,10 @@ const io = socketIo(server, {
 io.on("connection", (socket) => {
   console.log("User connected via WebSocket");
 
+  socket.on("error", (error) => {
+    console.error("WebSocket error:", error);
+  });
+
   // 註冊用戶
   socket.on("register", (userId) => {
     console.log("User registered with ID:", userId);
@@ -44,9 +48,12 @@ server.listen(PORT, () => {
 
   // 启动RabbitMQ消息消费者
   rabbitMQConsumer.consumeMessage("notify_queue", (content) => {
-    console.log("Received message from RabbitMQ:", content, content.userId);
-
+    console.log("Received message from RabbitMQ:", content);
     // 发送WebSocket消息到特定用户
     io.to(content.userId.toString()).emit("newNotification", content);
+    console.log(
+      "Notification message sent to socket for user:",
+      content.userId
+    );
   });
 });

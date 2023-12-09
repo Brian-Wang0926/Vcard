@@ -1,33 +1,23 @@
 import React, { useState, useEffect, useRef } from "react";
-import socketIOClient from "socket.io-client";
 import axios from "axios";
 import authServiceInstance from "../services/auth-service";
 import useUserStore from "../stores/userStore";
+import { initSocket, getSocket } from "./socketManager";
 
 const ChatRoomComponent = (props) => {
   const [chat, setChat] = useState([]);
   const [message, setMessage] = useState("");
   const { currentUser } = useUserStore();
-
   const chatContainerRef = useRef(null);
-  const socket = useRef(
-    socketIOClient(process.env.REACT_APP_API_URL, {
-      reconnectionAttempts: 5, // 重连尝试次数
-      reconnectionDelay: 10000, // 重连延迟时间（毫秒）
-    })
-  );
 
   useEffect(() => {
-    // 當好友被選中，從後端取得聊天紀錄
-    const currentSocket = socket.current;
-
-    currentSocket.emit("join", currentUser.id);
+    const currentSocket = initSocket(currentUser.id);
 
     currentSocket.on("new_message", (data) => {
       setChat((oldChats) => [...oldChats, data]);
     });
 
-    return () => currentSocket.disconnect();
+    return () => currentSocket.off("new_message");
   }, [currentUser]);
 
   useEffect(() => {
@@ -64,15 +54,16 @@ const ChatRoomComponent = (props) => {
   }, [chat]);
 
   const sendMessage = () => {
-    console.log(
-      `前端從${currentUser.id}發送訊息給${props.otherUserId}內容是${message}`
-    );
-
-    socket.current.emit("private_message", {
+    const currentSocket = getSocket();
+    const newMessage = {
       fromUserId: currentUser.id,
       toUserId: props.otherUserId,
       message: message,
-    });
+    };
+
+    console.log(`Sending message:`, newMessage);
+
+    currentSocket.emit("private_message", newMessage);
 
     // 新增以下程式碼以即時顯示自己的訊息
     setChat((oldChats) => [

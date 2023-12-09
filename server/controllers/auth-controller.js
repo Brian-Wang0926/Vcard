@@ -5,7 +5,7 @@ const googleCallback = (req, res) => {
   const { user } = req;
   const tokenObj = { _id: user.id, email: user.email, name: user.name };
   const token = jwt.sign(tokenObj, process.env.JWT_SECRET, {
-    expiresIn: "7d",
+    expiresIn: "1d",
   });
 
   res.redirect(
@@ -34,7 +34,7 @@ const mockLogin = async (req, res) => {
     }
     const tokenObj = { _id: user._id, email: user.email, name: user.name };
     const token = jwt.sign(tokenObj, process.env.JWT_SECRET, {
-      expiresIn: "7d",
+      expiresIn: "1d",
     });
     res.json({ token, name: user.name, id: user._id });
   } catch (error) {

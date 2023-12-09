@@ -8,10 +8,9 @@ async function connectRabbitMQ() {
       process.env.RABBITMQ_URL || "amqp://localhost"
     );
     channel = await connection.createChannel();
-    console.log("connectRabbitMQ", connection, channel);
+    console.log("connectRabbitMQ");
   } catch (error) {
     console.error("Error connecting to RabbitMQ:", error);
-    // 实施重试逻辑或发出警告
   }
 }
 
@@ -21,12 +20,11 @@ async function sendMessage(queue, message) {
   }
 
   try {
-    await channel.assertQueue(queue, { durable: false });
+    await channel.assertQueue(queue, { durable: true });
     console.log("Sending message to queue:", queue, message);
     channel.sendToQueue(queue, Buffer.from(JSON.stringify(message)));
   } catch (error) {
     console.error("Error sending message to RabbitMQ:", error);
-    // 实施重试逻辑或发出警告
   }
 }
 

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import socketIOClient from "socket.io-client";
+import { initSocket } from "./socketManager";
 import { useNavigate, NavLink } from "react-router-dom";
 import AuthService from "../services/auth-service";
 import useUserStore from "../stores/userStore";
@@ -21,21 +21,14 @@ const NavComponent = () => {
 
   useEffect(() => {
     if (currentUser && currentUser.id) {
-      const socket = socketIOClient(process.env.REACT_APP_API_URL, {
-        reconnectionAttempts: 5, // 重连尝试次数
-        reconnectionDelay: 10000, // 重连延迟时间（毫秒）
-      });
-      
-      socket.on("connect", () => {
-        socket.emit("register", currentUser.id);
-      });
+      const currentSocket = initSocket(currentUser.id);
 
-      socket.on("newNotification", (message) => {
-        console.log("newNotification顯示message", message);
+      currentSocket.on("newNotification", (message) => {
+        console.log("socket接收newNotification", message);
         addNotification(message);
       });
 
-      return () => socket.disconnect();
+      return () => currentSocket.off("newNotification");
     }
   }, [currentUser, addNotification]);
 
