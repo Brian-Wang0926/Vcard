@@ -9,7 +9,10 @@ import CardIcon from "../icons/8664908_window_restore_application_icon.svg";
 import ChatIcon from "../icons/8664935_message_chat_communication_icon.svg";
 import ProfileIcon from "../icons/8664831_user_icon.svg";
 import NotifyIcon from "../icons/8664802_bell_icon.svg";
+import LoginIcon from "../icons/8679806_login_box_icon.svg";
+import LogoutIcon from "../icons/8679795_logout_box_icon.svg";
 import NotificationsComponent from "./notifications-component";
+
 // import SearchBar from "./searchBar";
 
 const NavComponent = () => {
@@ -68,7 +71,7 @@ const NavComponent = () => {
           <div className="flex justify-between items-center h-full">
             <a
               href="/"
-              className="p-2 text-black font-bold tracking-widest text-3xl"
+              className="p-2 text-black font-bold  text-xl sm:text-3xl md:tracking-widest"
             >
               Vcard
             </a>
@@ -120,13 +123,15 @@ const NavComponent = () => {
               )}
               {!currentUser && (
                 <li className="nav-item">
-                  <NavLink to="/login">登入</NavLink>
+                  <NavLink to="/login">
+                    <img src={LoginIcon} className="w-6 h-6 m-2" alt="登入" />
+                  </NavLink>
                 </li>
               )}
               {currentUser && (
                 <li className="nav-item flex items-center">
                   <NavLink onClick={handleLogout} to="/login">
-                    登出
+                    <img src={LogoutIcon} className="w-6 h-6 m-2" alt="登出" />
                   </NavLink>
                 </li>
               )}

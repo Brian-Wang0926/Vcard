@@ -9,6 +9,7 @@ function HomeComponent({ boards, setBoards }) {
   const [searchParams] = useSearchParams();
   const [selectedBoard, setSelectedBoard] = useState(null); // null 表示所有文章
   const { currentUser, setCurrentUser } = useUserStore();
+  const [isBoardListVisible, setIsBoardListVisible] = useState(false);
 
   useEffect(() => {
     const currentUser = authService.getCurrentUser();
@@ -26,15 +27,30 @@ function HomeComponent({ boards, setBoards }) {
 
   return (
     <div className=" bg-gray-800 min-h-screen pt-14 ">
-      <div className="flex mx-auto max-w-screen-xl">
-        <div className="flex-none w-1/4">
+      <div className="flex flex-col md:flex-row mx-auto max-w-screen-xl">
+        <button
+          className="md:hidden bg-gray-800 text-white rounded h-3 "
+          onClick={() => setIsBoardListVisible(!isBoardListVisible)}
+        >
+          {isBoardListVisible ? "hide" : "..."}
+        </button>
+
+        <div
+          className={`${
+            isBoardListVisible ? "block" : "hidden"
+          } md:block w-full md:w-1/4`}
+        >
           <BoardListComponent
             boards={boards}
             setBoards={setBoards}
             setSelectedBoard={setSelectedBoard}
           />
         </div>
-        <div className="flex-none w-3/4">
+        <div
+          className={`flex-grow ${
+            isBoardListVisible ? "hidden md:block" : "w-full"
+          }`}
+        >
           <ArticleListComponent
             board={selectedBoard}
             currentUser={currentUser}
