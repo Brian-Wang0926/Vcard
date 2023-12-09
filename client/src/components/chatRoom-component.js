@@ -9,7 +9,8 @@ const ChatRoomComponent = (props) => {
   const [message, setMessage] = useState("");
   const { currentUser } = useUserStore();
   const chatContainerRef = useRef(null);
-
+  const isOtherUserSelected = Boolean(props.otherUserId);
+  console.log("isOtherUserSelected", isOtherUserSelected);
   useEffect(() => {
     const currentSocket = initSocket(currentUser.id);
 
@@ -40,7 +41,7 @@ const ChatRoomComponent = (props) => {
   }, [props.otherUserId]);
 
   const handleKeyPress = (e) => {
-    if (e.key === "Enter") {
+    if (e.key === "Enter" && message.trim() && isOtherUserSelected) {
       sendMessage();
     }
   };
@@ -54,6 +55,10 @@ const ChatRoomComponent = (props) => {
   }, [chat]);
 
   const sendMessage = () => {
+    if (!message.trim() || !isOtherUserSelected) {
+      return; // 如果没有输入文本或没有选中聊天对象，不执行发送操作
+    }
+
     const currentSocket = getSocket();
     const newMessage = {
       fromUserId: currentUser.id,
@@ -128,10 +133,12 @@ const ChatRoomComponent = (props) => {
             onChange={(e) => setMessage(e.target.value)}
             onKeyPress={handleKeyPress}
             className="w-full border border-gray-300 rounded px-4 py-2 mr-2 "
+            disabled={!isOtherUserSelected}
           />
           <button
             onClick={sendMessage}
-            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded "
+            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded disabled:opacity-50"
+            disabled={!isOtherUserSelected}
           >
             Send
           </button>

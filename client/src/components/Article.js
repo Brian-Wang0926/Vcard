@@ -18,11 +18,14 @@ const Article = ({ article, onArticleClick }) => {
         </div>
         <div className="text-lg truncate ...">{article.title}</div>
         <div className="text-sm truncate ...">{article.content}</div>
-        <div className="flex items-center text-sm text-gray-500 mt-2 overflow-hidden">
-          <img src={LikeRed} alt="like button" className="h-4 w-4 mr-2" />
-          <span className="truncate mr-3">{article.likes.length}</span>
-          <img src={message} alt="message" className="h-4 w-4 mr-2" />
-          <span className="truncate mr-3">{article.commentCount}</span>
+        <div className="flex items-center text-sm text-gray-500 mt-2 overflow-hidden ">
+          <div className="flex items-center cursor-default ">
+            <img src={LikeRed} alt="like button" className="h-4 w-4 mr-2" />
+            <span className="truncate mr-3">{article.likes.length}</span>
+            <img src={message} alt="message" className="h-4 w-4 mr-2" />
+            <span className="truncate mr-3">{article.commentCount}</span>
+          </div>
+
           <SaveButton articleId={article._id} />
         </div>
       </div>
