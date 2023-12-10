@@ -138,8 +138,9 @@ const getPairs = async (req, res) => {
     console.log("getPairs", userId);
     const cards = await Card.find({
       $or: [{ userID1: userId }, { userID2: userId }],
-      expiryDate: { $gte: currentDate },
+      // expiryDate: { $gte: currentDate },
     }).populate("userID1 userID2");
+    console.log("取得cards", cards);
     res.json(cards);
   } catch (e) {
     console.error("Error getting pairs:", e);

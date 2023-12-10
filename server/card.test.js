@@ -21,7 +21,7 @@ describe("Card Pairing", () => {
       useUnifiedTopology: true,
     });
     server = http.createServer(app).listen(0);
-    console.log("成功連結");
+    console.log("成功連結", server);
   });
 
   beforeEach(async () => {
@@ -29,15 +29,7 @@ describe("Card Pairing", () => {
     await Card.deleteMany({});
     console.log("成功刪除");
   });
-
-  beforeEach(() => {
-    jest.useFakeTimers("modern"); // 使用现代的定时器模拟
-  });
-
-  afterEach(() => {
-    jest.useRealTimers();
-  });
-
+  
 
   // 在每個測試案例執行前，建立模擬的使用者資料
   const createUser = async (num) => {
@@ -77,26 +69,31 @@ describe("Card Pairing", () => {
   //   await testPairing(10);
   // }, 120000);
 
-
   it("should set correct expiryDate and status on pairs", async () => {
     await testPairing(10);
+    console.log("配對結束");
     const cards = await Card.find({});
+    console.log("過期", cards);
     cards.forEach((card) => {
-      expect(card.status).toBe(true); // 确保卡片的状态被正确设置
+      expect(card.status).toBe(true);
       expect(new Date(card.expiryDate).getTime()).toBeGreaterThan(Date.now());
     });
   }, 120000);
 
-
   it("pairs should disappear after a day", async () => {
     await testPairing(10);
 
-    // 快进时间到第二天
-    jest.setSystemTime(new Date("2023-01-02T00:00:00Z"));
+    // 模拟时间流逝
+    jest
+      .spyOn(global, "Date")
+      .mockImplementation(() => new Date("2023-01-02T00:00:00Z"));
 
     const response = await request(server).get("/api/card/getPairs");
     expect(response.status).toBe(200);
     expect(response.body.length).toBe(0);
+
+    // 还原时间模拟
+    global.Date.mockRestore();
   }, 120000);
 
   afterAll(async () => {

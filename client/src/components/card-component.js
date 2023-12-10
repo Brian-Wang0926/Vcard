@@ -37,15 +37,21 @@ const CardComponent = (props) => {
           `${process.env.REACT_APP_API_URL}/api/card/getPairs`,
           { headers: authServiceInstance.authHeader() }
         );
+        console.log("前端fetchPair", response);
         const cards = response.data;
+        console.log("cards", cards);
         const currentDate = new Date();
+        console.log("currentDate", currentDate);
         const validCard = cards.find((card) => {
           const isUserInvolved =
             card.userID1._id === userId || card.userID2._id === userId;
-          const isCardActive =
-            new Date(card.expiryDate) > currentDate && card.status;
+          console.log("isUserInvolved", isUserInvolved);
+          
+          const isCardActive = new Date(card.expiryDate) > currentDate;
+          console.log("isCardActive", isCardActive);
           return isUserInvolved && isCardActive;
         });
+        console.log("是否validCard", validCard);
 
         if (validCard) {
           const pairedUserData =
@@ -53,6 +59,7 @@ const CardComponent = (props) => {
               ? validCard.userID2
               : validCard.userID1;
           setPairedUser(pairedUserData);
+          console.log("前端已設定setPairedUser", pairedUserData);
           setCardId(validCard._id);
           if (validCard.acceptedBy.includes(userId)) {
             setInviteStatus("已發送");
