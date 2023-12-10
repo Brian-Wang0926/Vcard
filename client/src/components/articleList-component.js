@@ -210,7 +210,7 @@ const ArticleListComponent = ({
 
       <div ref={loader} className="h-18 bg-gray-200" />
       <button
-        className="fixed right-5 bottom-5 z-50 bg-transparent border-none cursor-pointer opacity-30 hover:opacity-100"
+        className="fixed right-5 bottom-5 z-5 bg-transparent border-none cursor-pointer opacity-30 hover:opacity-100"
         onClick={() => {
           if (scrollContainerRef.current) {
             scrollContainerRef.current.scrollTo({
@@ -220,7 +220,7 @@ const ArticleListComponent = ({
           }
         }}
       >
-        <ArrowUpIcon className="w-7 h-7" />
+        <ArrowUpIcon className="w-7 h-7 z-5" />
       </button>
     </div>
   );

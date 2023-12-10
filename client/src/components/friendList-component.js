@@ -45,7 +45,7 @@ function FriendListComponent(props) {
 
   return (
     <div className="m-2">
-      <h3 className="m-2">好友列表</h3>
+      <h3 className="m-2 text-xs sm:text-base">好友列表</h3>
       <ul>
         {friends.map((friend) => (
           <li
@@ -64,7 +64,7 @@ function FriendListComponent(props) {
               alt={friend.name}
               className="w-10 h-10 rounded-full object-cover"
             />
-            <span>{friend.name}</span>
+            <span className="hidden sm:inline">{friend.name}</span>
           </li>
         ))}
       </ul>

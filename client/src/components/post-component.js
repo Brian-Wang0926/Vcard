@@ -201,41 +201,42 @@ const PostComponent = ({ boards }) => {
 
   return (
     <div className="prose post-editor-component max-w-screen-xl mx-auto mt-4 pt-14">
-      <div className="flex items-center mb-4">
-        <div className="whitespace-nowrap px-2" style={{ width: "auto" }}>
-          標題：
+      <div className="mb-4">
+        <div className="flex flex-col mb-2">
+          <input
+            type="text"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            placeholder="請輸入文章標題"
+            className="p-2 border border-gray-300 rounded w-full"
+            style={{ height: "40px" }}
+          />
         </div>
-        <input
-          type="text"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          placeholder="請輸入文章標題"
-          className="flex-grow p-2 border border-gray-300 rounded mr-2"
-          style={{ height: "40px" }}
-        />
-        <select
-          value={selectedBoard}
-          onChange={(e) => setSelectedBoard(e.target.value)}
-          className="p-2 border border-gray-300 rounded mr-2"
-          style={{ flexBasis: "15%", height: "40px" }}
-        >
-          <option value="">選擇一個看板</option>
-          {boards.map((board) => (
-            <option key={board._id} value={board._id}>
-              {board.name}
-            </option>
-          ))}
-        </select>
-        <button
-          onClick={handleSubmit}
-          disabled={!selectedBoard}
-          className={` bg-blue-500 text-white py-2 px-4 rounded-lg ${
-            !selectedBoard ? "opacity-50" : ""
-          }`}
-          style={{ flexBasis: "5%", height: "40px" }}
-        >
-          Submit
-        </button>
+        <div className="flex flex-col sm:flex-row items-center">
+          <select
+            value={selectedBoard}
+            onChange={(e) => setSelectedBoard(e.target.value)}
+            className="p-2 border border-gray-300 rounded mb-2 sm:mb-0 sm:mr-2 w-full"
+            style={{ height: "40px" }}
+          >
+            <option value="">選擇一個看板</option>
+            {boards.map((board) => (
+              <option key={board._id} value={board._id}>
+                {board.name}
+              </option>
+            ))}
+          </select>
+          <button
+            onClick={handleSubmit}
+            disabled={!selectedBoard}
+            className={`bg-blue-500 text-white py-2 px-4 rounded-lg ${
+              !selectedBoard ? "opacity-50" : ""
+            } w-full sm:w-auto`}
+            style={{ height: "40px" }}
+          >
+            Submit
+          </button>
+        </div>
       </div>
 
       <MdEditor

@@ -277,7 +277,7 @@ const ArticleModal = ({ articleId, onClose, onUpdate }) => {
         onClick={onClose}
       >
         <div
-          className="w-3/4 h-full bg-white pt-6 pr-0 pb-6 rounded shadow-lg relative flex flex-col"
+          className=" w-full md:w-3/4 h-full bg-white pt-6 pr-0 pb-6 rounded shadow-lg relative flex flex-col z-10"
           onClick={handleModalContainerClick} //阻止事件冒泡
         >
           <button

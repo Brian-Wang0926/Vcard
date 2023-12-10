@@ -15,7 +15,7 @@ const NotificationsComponent = () => {
   const reversedNotifications = [...notifications].reverse();
 
   return (
-    <div className="absolute top-full right-0 mt-2 py-2 w-96 bg-white  rounded-lg shadow-2xl">
+    <div className="absolute top-full -right-28 mt-2 py-2 w-80 bg-white  rounded-lg shadow-2xl">
       <div className="flex flex-col justify-between max-h-[75vh]">
         <div className="overflow-y-auto">
           {reversedNotifications.length === 0 ? (
