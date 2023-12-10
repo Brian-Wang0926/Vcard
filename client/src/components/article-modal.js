@@ -307,7 +307,7 @@ const ArticleModal = ({ articleId, onClose, onUpdate }) => {
 
           {/* 文章內容區域 */}
           <div className="overflow-auto mb-10 ">
-            <div className="ml-6 min-h-[75vh]">
+            <div className="ml-6 mr-5 min-h-[75vh]">
               <div>{article.author.name}</div>
               <div className="text-2xl font-semibold my-4">{article.title}</div>
               <div>
@@ -385,7 +385,7 @@ const ArticleModal = ({ articleId, onClose, onUpdate }) => {
                     </div>
                     {/* 留言愛心 */}
                     <div className="flex items-center">
-                      <span className="mx-3 min-w-[3em] text-right">
+                      <span className="mx-3 min-w-[2em] sm:min-w-[3em] text-right">
                         {comment.likeCount}
                       </span>
                       <CommentHeartButton
