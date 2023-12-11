@@ -11,6 +11,7 @@ import ProfileIcon from "../icons/8664831_user_icon.svg";
 import NotifyIcon from "../icons/8664802_bell_icon.svg";
 import LoginIcon from "../icons/8679806_login_box_icon.svg";
 import LogoutIcon from "../icons/8679795_logout_box_icon.svg";
+import VcardLogo from "../icons/vcard-logo.png";
 import NotificationsComponent from "./notifications-component";
 
 // import SearchBar from "./searchBar";
@@ -69,11 +70,8 @@ const NavComponent = () => {
       >
         <div className="mx-auto max-w-screen-xl px-4 h-full">
           <div className="flex justify-between items-center h-full">
-            <a
-              href="/"
-              className="p-2 text-black font-bold  text-xl sm:text-3xl md:tracking-widest"
-            >
-              Vcard
+            <a href="/">
+              <img src={VcardLogo} className="w-28" alt="vcard" />
             </a>
             {/* <SearchBar /> */}
             <ul className="flex space-x-4">
