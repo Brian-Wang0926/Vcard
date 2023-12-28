@@ -3,9 +3,7 @@ const Article = require("../models/article-model");
 
 const createComment = async (req, res) => {
   try {
-    console.log("後端建立留言");
     const { text, author, article } = req.body;
-    console.log("後端建立留言", text, author, article);
     const newComment = new Comment({
       text,
       author,
@@ -13,7 +11,6 @@ const createComment = async (req, res) => {
     });
     await newComment.save();
     await newComment.populate("author", "name");
-    console.log("後端建立留言成功", newComment);
     await Article.findByIdAndUpdate(article, { $inc: { commentCount: 1 } });
     res.status(200).json(newComment);
   } catch (e) {
@@ -24,7 +21,6 @@ const createComment = async (req, res) => {
 const deleteComment = async (req, res) => {
   try {
     const commentId = req.params.commentId;
-    console.log("後端刪留言", commentId);
     let comment = await Comment.findById(commentId);
 
     if (!comment) {
@@ -50,12 +46,10 @@ const deleteComment = async (req, res) => {
 const getCommentsByArticle = async (req, res) => {
   try {
     const articleId = req.params.articleId;
-    console.log("後端取得留言", articleId);
     const comments = await Comment.find({ article: articleId }).populate(
       "author",
       "name"
     );
-    console.log("後端取得留言成功", comments);
     res.json(comments);
   } catch (e) {
     res.status(500).json({ message: "無法獲取留言", e });

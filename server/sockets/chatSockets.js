@@ -1,16 +1,12 @@
 const Chat = require("../models/chat-model");
 
 module.exports = function (socket, io) {
-  console.log("使用者成功連結");
-
   socket.on("join", (userId) => {
-    console.log("join加入", userId);
     socket.join(userId);
   });
 
   socket.on("private_message", async (data) => {
     const { fromUserId, toUserId, message } = data;
-    console.log(`後端收到資料 ${JSON.stringify(data)}`);
 
     if (!fromUserId || !toUserId || !message) {
       socket.emit("error_message", "必須提供發送者、接收者和消息內容。");

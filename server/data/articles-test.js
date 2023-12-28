@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 const mongooseUri =
-  process.env.MONGODB_URI || "mongodb://localhost:27017/Vcard";
+  process.env.MONGODB_URI;
 const Article = require("../models/article-model");
 const Board = require("../models/board-model");
 

@@ -13,12 +13,10 @@ const getAllBoards = async (req, res) => {
   try {
     const cachedBoards = await redisClient.get(cacheKey);
     if (cachedBoards) {
-      console.log("從redis取得看板");
       return res.json(JSON.parse(cachedBoards));
     }
 
     const boards = await Board.find();
-    console.log("資料庫回傳");
     await redisClient.set(cacheKey, JSON.stringify(boards));
     res.json(boards);
   } catch (error) {
@@ -29,13 +27,11 @@ const getAllBoards = async (req, res) => {
 const getArticlesByUser = async (req, res) => {
   try {
     const userId = req.userId;
-    console.log("開始篩選使用者文章", userId);
     // 根据 userId 查询文章
     const articles = await Article.find({ author: userId })
       .populate("author", "name")
       .populate("board", "name")
       .sort({ createdAt: -1 });
-    console.log("篩選結果", articles);
     res.json(articles);
   } catch (e) {
     res.status(500).json({ message: "無法獲取文章", e });
@@ -44,7 +40,6 @@ const getArticlesByUser = async (req, res) => {
 
 const uploadImageToS3 = async (req, res) => {
   try {
-    console.log("後端開始uploadImageToS3");
     const { getSignedUrl } = require("@aws-sdk/s3-request-presigner");
     const { S3Client, PutObjectCommand } = require("@aws-sdk/client-s3");
 
@@ -57,7 +52,6 @@ const uploadImageToS3 = async (req, res) => {
     });
 
     const { fileName, fileType } = req.query;
-    console.log("後端api", fileName, fileType);
 
     const command = new PutObjectCommand({
       Bucket: process.env.YOUR_S3_BUCKET_NAME,
@@ -68,8 +62,6 @@ const uploadImageToS3 = async (req, res) => {
     const signedUrl = await getSignedUrl(s3Client, command, {
       expiresIn: 36000,
     });
-    console.log("後端儲存至s3成功", signedUrl);
-
     res.json({ url: signedUrl });
   } catch (err) {
     console.error("Error creating presigned URL", err);
@@ -78,7 +70,6 @@ const uploadImageToS3 = async (req, res) => {
 };
 
 const getPartArticles = async (req, res) => {
-  console.log("開始getPartArticles");
   try {
     // const cacheKey = `articlesPreview:${JSON.stringify(req.query)}`;
 
@@ -102,22 +93,16 @@ const getPartArticles = async (req, res) => {
     // 检查是否存在 savedArticleIds 参数
     if ("savedArticleIds" in req.query) {
       const savedArticleIds = req.query.savedArticleIds.split(",");
-      console.log("啥", savedArticleIds);
       if (savedArticleIds.length === 0 || savedArticleIds[0] === "") {
-        console.log("沒有收藏");
         return res.json([]);
       }
       query._id = { $in: savedArticleIds };
-      console.log("有收藏");
     } else {
-      console.log("savedArticleIds 未提供");
       // 这里可以根据需要处理当 savedArticleIds 参数未提供的情况
     }
 
     const limit = parseInt(req.query.limit) || 6;
     const page = parseInt(req.query.page) || 1;
-    console.log("目前後端載入筆數頁數", limit, page);
-    console.log("目前後端接收資料", query);
 
     const articles = await Article.find(query)
       .populate("author", "name")
@@ -141,7 +126,6 @@ const getPartArticles = async (req, res) => {
         isFromCache: false,
       };
     });
-    console.log("資料庫取得預覽文章");
 
     // 將數據存儲到 Redis，設置緩存時間（ 1 小時）
     // await redisClient.set(cacheKey, JSON.stringify(articlesPreview), {
@@ -155,7 +139,6 @@ const getPartArticles = async (req, res) => {
 };
 
 const getFullArticle = async (req, res) => {
-  console.log("進入取得完整文章api");
   const articleId = req.params.id;
   const cacheKey = `article:${articleId}`;
   // console.log("取得cacheKey", cacheKey);
@@ -176,7 +159,6 @@ const getFullArticle = async (req, res) => {
     if (!article) {
       return res.status(404).json({ message: "文章未找到" });
     }
-    console.log("後端取得完整文章", article);
     article.isFromCache = false;
     // 將數據存儲到 Redis，設置緩存時間（ 1 小時）
     await redisClient.set(cacheKey, JSON.stringify(article), {
@@ -199,7 +181,6 @@ const createArticle = async (req, res) => {
       board,
     });
     await newArticle.save();
-    console.log("已成功儲存到資料庫", newArticle._id);
 
     // 清除文章列表的缓存
     // await redisClient.del("articlesPreview:*");
@@ -212,7 +193,6 @@ const createArticle = async (req, res) => {
     // 查找订阅了这个看板的所有用户
     // 是抓所有資料，是否抓id就好
     const subscribedUsers = await User.find({ subscribedBoards: board });
-    console.log("Subscribed users:");
 
     // 对每个用户发送通知消息
     subscribedUsers.forEach((user) => {
@@ -221,7 +201,6 @@ const createArticle = async (req, res) => {
         articleId: newArticle._id,
         message: `New post "${title}" in your subscribed board: ${boardName}`,
       });
-      console.log("從createArticle發出rabbitMQ")
     });
 
     res.status(200).json(newArticle);
@@ -234,7 +213,6 @@ const deleteArticle = async (req, res) => {
   try {
     const articleId = req.params.id;
     const article = await Article.findById(articleId);
-    console.log("資料庫找到文章", article);
     if (!article) {
       return res.status(404).json({ message: "文章未找到" });
     }
@@ -245,7 +223,6 @@ const deleteArticle = async (req, res) => {
 
     // 清除这篇文章的缓存
     await redisClient.del(`article:${articleId}`);
-    console.log("文章缓存已清除");
 
     res.status(200).json({ message: "文章已刪除" });
   } catch (e) {
@@ -279,7 +256,6 @@ const updateArticle = async (req, res) => {
     await redisClient.del(`article:${id}`);
 
     res.status(200).json(updatedArticle);
-    console.log("文章修改成功");
   } catch (e) {
     res.status(500).json({ message: "更新文章時出現錯誤", e });
   }
@@ -303,7 +279,6 @@ const likeArticle = async (req, res) => {
     }
 
     const updatedArticle = await article.save();
-    console.log("後端成功點擊該文章喜歡", article);
 
     // 更新 Redis 缓存
     const cacheKey = `article:${id}`;
@@ -317,7 +292,6 @@ const likeArticle = async (req, res) => {
       await redisClient.set(cacheKey, JSON.stringify(updatedCacheArticle), {
         EX: 3600, // 设置缓存过期时间，例如 1 小时
       });
-      console.log("成功更新 Redis 缓存");
     }
 
     res.status(200).json(updatedArticle);
@@ -326,35 +300,6 @@ const likeArticle = async (req, res) => {
   }
 };
 
-// 删除匹配模式的键的辅助函数
-// async function deleteKeysByPattern(pattern) {
-//   console.log("进入 deleteKeysByPattern");
-//   let cursor = "0";
-//   do {
-//     try {
-//       const reply = await redisClient.scan(
-//         cursor,
-//         "MATCH",
-//         pattern,
-//         "COUNT",
-//         1000 // 增加 COUNT 值
-//       );
-
-//       cursor = reply.cursor;
-//       const keys = reply.keys;
-
-//       if (keys.length > 0) {
-//         console.log("Deleting keys:", keys);
-//         await redisClient.del(keys);
-//       } else {
-//         console.log("No keys found for pattern, continuing scan.");
-//       }
-//     } catch (err) {
-//       console.error("Error in deleteKeysByPattern:", err);
-//       throw err;
-//     }
-//   } while (cursor !== "0");
-// }
 
 module.exports = {
   getAllBoards,

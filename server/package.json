@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "jest",
+    "test": "NODE_ENV=test jest",
     "preinstall": "export PUPPETEER_SKIP_DOWNLOAD=true || set PUPPETEER_SKIP_DOWNLOAD=true"
   },
   "author": "",

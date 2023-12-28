@@ -10,8 +10,9 @@ async function consumeMessage(queue, callback) {
     try {
       console.log("Connecting to RabbitMQ...");
       connection = await amqp.connect(
-        process.env.RABBITMQ_URL || "amqp://localhost"
+        process.env.RABBITMQ_URL
       );
+      console.log("RABBITMQ_URL",process.env.RABBITMQ_URL)
       channel = await connection.createChannel();
       await channel.assertQueue(queue, { durable: true });
 
