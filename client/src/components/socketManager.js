@@ -10,7 +10,6 @@ export const initSocket = (userId) => {
     });
 
     socket.on("connect", () => {
-      console.log("Connected to WebSocket server");
       socket.emit("register", userId);
     });
 

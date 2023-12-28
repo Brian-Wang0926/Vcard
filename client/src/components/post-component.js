@@ -44,7 +44,6 @@ const PostComponent = ({ boards }) => {
 
   useEffect(() => {
     if (articleToEdit) {
-      console.log("編輯文章", articleToEdit);
       // Populate form fields with the article data
       setTitle(articleToEdit.title);
       setContent(articleToEdit.content);
@@ -77,21 +76,16 @@ const PostComponent = ({ boards }) => {
   const handleImageUpload = (file) => {
     return new Promise((resolve, reject) => {
       const blobUrl = URL.createObjectURL(file);
-      console.log("Uploading file:", file); // 打印文件对象
       setUploadedImages((prevUploadedImages) => [
         ...prevUploadedImages,
         { blobUrl, file },
       ]);
-      console.log("前端編輯區", blobUrl);
       resolve(blobUrl); // 解析 Promise 与 blob URL
     });
   };
 
   const uploadImageToS3 = async (file) => {
     try {
-      console.log("前端上傳到s3", file);
-      console.log("Uploading to S3, file type:", file.type, "size:", file.size);
-      console.log("檔名", file.name);
       const extension = file.name.split(".").pop();
 
       const randomFileName = `${Date.now()}-${Math.random()
@@ -109,7 +103,6 @@ const PostComponent = ({ boards }) => {
         }
       );
       const presignedUrl = response.data.url;
-      console.log("預簽名 URL", presignedUrl);
 
       // 使用 axios 上傳圖片到 S3
       await axios.put(presignedUrl, file, {
@@ -120,7 +113,6 @@ const PostComponent = ({ boards }) => {
 
       // 构造并返回 CloudFront URL
       const cloudFrontUrl = `${process.env.REACT_APP_CLOUDFRONT_URL}/${randomFileName}`;
-      console.log("CloudFront URL", cloudFrontUrl);
       return cloudFrontUrl;
     } catch (error) {
       console.error("Error uploading image to S3:", error);
@@ -148,13 +140,10 @@ const PostComponent = ({ boards }) => {
     const imagesToUpload = uploadedImages.filter((image) =>
       image.blobUrl.startsWith("blob:")
     );
-    console.log("前端", imagesToUpload);
 
     for (const image of imagesToUpload) {
-      console.log("前端image", image);
       if (image.file) {
         const s3Url = await uploadImageToS3(image.file); // 上传图片并返回 S3 URL
-        console.log("前端s3Url", s3Url);
         updatedContent = updatedContent.replace(image.blobUrl, s3Url);
       } else {
         console.error("File object is missing");
@@ -168,14 +157,10 @@ const PostComponent = ({ boards }) => {
       content: updatedContent,
       author: currentUser?.id,
     };
-    console.log("看板", selectedBoard);
-    console.log("Article Data: ", articleData);
-    // 发送 POST 请求到后端
     try {
       let response;
 
       if (articleToEdit) {
-        console.log("修改文章", articleToEdit);
         response = await axios.put(
           `${process.env.REACT_APP_API_URL}/api/article/${articleToEdit._id}`,
           articleData,
@@ -188,8 +173,6 @@ const PostComponent = ({ boards }) => {
           { headers: authServiceInstance.authHeader() }
         );
       }
-      console.log("後端回傳", response);
-
       ["articleTitle", "content", "selectedBoard"].forEach((key) =>
         localStorage.removeItem(key)
       );

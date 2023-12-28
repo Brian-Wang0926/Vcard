@@ -7,7 +7,6 @@ export const fetchSavedArticles = async () => {
       `${process.env.REACT_APP_API_URL}/api/profile/save-article`,
       { headers: authServiceInstance.authHeader() }
     );
-    console.log("后端收藏文章", response.data.savedArticles);
     return response.data.savedArticles;
   } catch (error) {
     console.error("Error fetching saved articles:", error);

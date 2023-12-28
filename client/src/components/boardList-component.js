@@ -32,17 +32,13 @@ const BoardListComponent = ({ boards, setSelectedBoard }) => {
 
   useEffect(() => {
     if (authChecked) {
-      console.log("檢查authChecked", authChecked);
       const fetchSubscriptions = async () => {
         try {
-          console.log("fetchSubscriptions", authServiceInstance.authHeader());
           const response = await axios.get(
             `${process.env.REACT_APP_API_URL}/api/profile/subscribe`,
             { headers: authServiceInstance.authHeader() }
           );
-          console.log("發api取得訂閱看版", response);
           if (response.status === 200) {
-            console.log("取得訂閱看版資料", response.data);
             useUserStore.setState({ subscribedBoards: new Set(response.data) });
           }
         } catch (error) {

@@ -6,7 +6,25 @@ on:
       - develop
 
 jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '14' # 或您项目所使用的Node.js版本
+
+      - name: Install Backend Dependencies
+        run: cd server && npm install
+
+      - name: Run Backend Tests
+        run: cd server && npm test
+
   build-and-push:
+    needs: test
     runs-on: ubuntu-latest
     steps:
 

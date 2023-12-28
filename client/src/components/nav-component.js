@@ -28,7 +28,6 @@ const NavComponent = () => {
       const currentSocket = initSocket(currentUser.id);
 
       currentSocket.on("newNotification", (message) => {
-        console.log("socket接收newNotification", message);
         addNotification(message);
       });
 

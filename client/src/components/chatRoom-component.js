@@ -10,7 +10,6 @@ const ChatRoomComponent = (props) => {
   const { currentUser } = useUserStore();
   const chatContainerRef = useRef(null);
   const isOtherUserSelected = Boolean(props.otherUserId);
-  console.log("isOtherUserSelected", isOtherUserSelected);
   useEffect(() => {
     const currentSocket = initSocket(currentUser.id);
 
@@ -65,8 +64,6 @@ const ChatRoomComponent = (props) => {
       toUserId: props.otherUserId,
       message: message,
     };
-
-    console.log(`Sending message:`, newMessage);
 
     currentSocket.emit("private_message", newMessage);
 

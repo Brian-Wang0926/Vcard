@@ -17,7 +17,6 @@ class AuthService {
 
   getCurrentUser() {
     const user = JSON.parse(localStorage.getItem("user"));
-    console.log("getCurrentUser", user);
     if (user && this.isTokenValid(user.token)) {
       return user;
     } else {

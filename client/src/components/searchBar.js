@@ -11,7 +11,6 @@ const SearchBar = () => {
 
   const handleSearch = async () => {
     try {
-      console.log("發送handleSearch api");
       const response = await axios.get(
         `${process.env.REACT_APP_API_URL}/api/search`,
         { params: { searchTerm } }
@@ -19,7 +18,6 @@ const SearchBar = () => {
 
       if (response.status === 200) {
         setSearchResults(response.data); // 更新搜索結果狀態
-        console.log("handleSearch回傳", response.data);
       }
     } catch (error) {
       console.error("搜索錯誤:", error);

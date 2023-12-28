@@ -22,7 +22,6 @@ function App() {
     if (storedUser) {
       setCurrentUser(storedUser); // 更新 Zustand store
       setAuthChecked(true); // 用户已登录，设置 authChecked 为 true
-      console.log("設定setCurrentUser及setAuthChecked為true");
     } else {
       setAuthChecked(false); // 用户未登录，设置 authChecked 为 false
     }

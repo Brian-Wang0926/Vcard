@@ -9,7 +9,6 @@ const NotificationsComponent = () => {
   } = useNotificationStore();
 
   const handleNotificationClick = (notification) => {
-    console.log("顯示notification", notification.articleId);
     setNotificationSelectedArticleId(notification.articleId);
   };
   const reversedNotifications = [...notifications].reverse();

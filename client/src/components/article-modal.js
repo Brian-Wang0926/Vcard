@@ -26,32 +26,21 @@ const ArticleModal = ({ articleId, onClose, onUpdate }) => {
   const navigate = useNavigate();
   const [article, setArticle] = useState("");
 
-  // 測試
-  // useEffect(() => {
-  //   console.log("ArticleModal 组件挂载，当前用户:", currentUser);
-  //   console.log("articleLiked 更新為", articleLiked);
-  //   console.log("article 更新為", article);
-  // }, [articleLiked, currentUser, article]);
-
   // 取得文章
   useEffect(() => {
     const fetchFullArticle = async () => {
       try {
-        console.log("有進入fetchFullArticle");
         const response = await axios.get(
           `${process.env.REACT_APP_API_URL}/api/article/${articleId}`,
           { headers: authServiceInstance.authHeader() }
         );
         setArticle(response.data);
-        console.log("成功取得完整文章", response.data);
-        console.log(response.data.isFromCache ? "從redis獲取" : "從資料庫獲取");
       } catch (error) {
         console.error("Error fetching full article:", error);
       }
     };
 
     if (articleId) {
-      console.log("有文章id", articleId);
       fetchFullArticle();
     }
   }, [articleId]);
@@ -133,10 +122,8 @@ const ArticleModal = ({ articleId, onClose, onUpdate }) => {
         ...article,
         commentCount: article.commentCount + 1,
       };
-      console.log("留言updatedArticle", updatedArticle);
       setArticle(updatedArticle);
       onUpdate(updatedArticle);
-      console.log("新增留言成功");
     } catch (error) {
       console.error("Error submitting comment:", error);
     }
@@ -160,7 +147,6 @@ const ArticleModal = ({ articleId, onClose, onUpdate }) => {
       );
       setEditingCommentId(null);
       setEditedText("");
-      console.log("更新留言成功");
     } catch (error) {
       console.error("Error updating comment:", error);
     }
@@ -177,7 +163,6 @@ const ArticleModal = ({ articleId, onClose, onUpdate }) => {
         ...article,
         commentCount: article.commentCount - 1,
       };
-      console.log("留言updatedArticle", updatedArticle);
       setArticle(updatedArticle);
       onUpdate(updatedArticle);
     } catch (error) {
@@ -200,10 +185,6 @@ const ArticleModal = ({ articleId, onClose, onUpdate }) => {
         `${process.env.REACT_APP_API_URL}/api/article/${articleId}/like`,
         {},
         { headers: authServiceInstance.authHeader() }
-      );
-      console.log(
-        "前端點擊愛心傳送api回傳",
-        response.data.likes.includes(currentUser.id)
       );
       setArticleLiked(response.data.likes.includes(currentUser.id));
 

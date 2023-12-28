@@ -47,7 +47,6 @@ const ArticleListComponent = ({
         } else if (showOnlyUserArticles && currentUser?.id) {
           params.append("authorId", currentUser.id);
         } else if (showOnlySavedArticles) {
-          console.log("進入showOnlySavedArticles");
           params.append("savedArticleIds", Array.from(savedArticles).join(","));
         }
 
@@ -55,7 +54,6 @@ const ArticleListComponent = ({
           process.env.REACT_APP_API_URL
         }/api/article?${params.toString()}`;
 
-        console.log("fetchArticles 發送api", endpoint);
         const response = await axios.get(endpoint, {
           headers: authServiceInstance.authHeader(),
         });
@@ -63,7 +61,6 @@ const ArticleListComponent = ({
 
         if (newArticles.length > 0) {
           newArticles.forEach((article) => {
-            console.log(article.isFromCache ? "從redis獲取" : "從資料庫獲取");
           });
 
           setArticles((prevArticles) =>
@@ -98,7 +95,6 @@ const ArticleListComponent = ({
   }, [notificationSelectedArticleId, clearNotificationSelectedArticleId]);
 
   useEffect(() => {
-    console.log("開始");
     if (scrollContainerRef.current) {
       scrollContainerRef.current.scrollTop = 0; // 滚动到容器顶部
     }
