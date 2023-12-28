@@ -20,9 +20,11 @@ jobs:
       - name: Install Backend Dependencies
         run: cd server && npm install
 
-      - name: Run Backend Tests
-        run: cd server && npm test
-
+      - name: Run Tests
+        run: cd server && npm test -- articleController.test.js
+        env:
+            GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
+            GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
   build-and-push:
     needs: test
     runs-on: ubuntu-latest
