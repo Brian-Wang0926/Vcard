@@ -2,13 +2,14 @@ require("dotenv").config();
 const request = require("supertest");
 const app = require("./app"); // 指向您的 Express 應用
 const mongoose = require("mongoose");
-const { MongoMemoryServer } = require('mongodb-memory-server');
+const { MongoMemoryServer } = require("mongodb-memory-server");
+const redisMock = require("redis-mock");
 const Article = require("./models/article-model"); // 路徑可能需要調整
 const jwt = require("jsonwebtoken");
 
 let mongoServer;
 let articleId;
-
+jest.mock("./redis-client", () => redisMock.createClient());
 // 測試前的設置
 beforeAll(async () => {
   mongoServer = await MongoMemoryServer.create();
