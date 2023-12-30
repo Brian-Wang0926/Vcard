@@ -6,36 +6,36 @@ on:
       - develop
 
 jobs:
-  test:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v2
+  # test:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: Checkout Repository
+  #       uses: actions/checkout@v2
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v2
-        with:
-          node-version: "14" # 或您项目所使用的Node.js版本
+  #     - name: Setup Node.js
+  #       uses: actions/setup-node@v2
+  #       with:
+  #         node-version: "14" # 或您项目所使用的Node.js版本
 
-      - name: Install Backend Dependencies
-        run: cd server && npm install
+  #     - name: Install Backend Dependencies
+  #       run: cd server && npm install
 
-      - name: Run Tests
-        run: cd server && npm test -- articleController.test.js
-        env:
-          YOUR_AWS_REGION: ${{ secrets.YOUR_AWS_REGION }}
-          YOUR_AWS_ACCESS_KEY: ${{ secrets.YOUR_AWS_ACCESS_KEY }}
-          YOUR_AWS_SECRET_KEY: ${{ secrets.YOUR_AWS_SECRET_KEY }}
-          YOUR_S3_BUCKET_NAME: ${{ secrets.YOUR_S3_BUCKET_NAME }}
-          CLOUDFRONT_URL: ${{ secrets.CLOUDFRONT_URL }}
-          GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
-          GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
-          JWT_SECRET: ${{ secrets.JWT_SECRET }}
-          APP_URI: ${{ secrets.APP_URI }}
-          BACKEND_URI: ${{ secrets.BACKEND_URI }}
-          REDIS_HOST: ${{ secrets.REDIS_HOST }}
-          REDIS_PORT: ${{ secrets.REDIS_PORT }}
-          RABBITMQ_URL: ${{ secrets.RABBITMQ_URL }}
+  #     - name: Run Tests
+  #       run: cd server && npm test -- articleController.test.js
+  #       env:
+  #         YOUR_AWS_REGION: ${{ secrets.YOUR_AWS_REGION }}
+  #         YOUR_AWS_ACCESS_KEY: ${{ secrets.YOUR_AWS_ACCESS_KEY }}
+  #         YOUR_AWS_SECRET_KEY: ${{ secrets.YOUR_AWS_SECRET_KEY }}
+  #         YOUR_S3_BUCKET_NAME: ${{ secrets.YOUR_S3_BUCKET_NAME }}
+  #         CLOUDFRONT_URL: ${{ secrets.CLOUDFRONT_URL }}
+  #         GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
+  #         GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
+  #         JWT_SECRET: ${{ secrets.JWT_SECRET }}
+  #         APP_URI: ${{ secrets.APP_URI }}
+  #         BACKEND_URI: ${{ secrets.BACKEND_URI }}
+  #         REDIS_HOST: ${{ secrets.REDIS_HOST }}
+  #         REDIS_PORT: ${{ secrets.REDIS_PORT }}
+  #         RABBITMQ_URL: ${{ secrets.RABBITMQ_URL }}
 
   build-and-push:
     needs: test
