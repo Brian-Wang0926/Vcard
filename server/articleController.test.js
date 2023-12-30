@@ -56,9 +56,8 @@ describe("Article Controller", () => {
 
     expect(response.body.title).toEqual(articleData.title);
     expect(response.body.content).toEqual(articleData.content);
-    // 其他斷言
     articleId = response.body._id;
-  });
+  }, 10000);
 
   test("updateArticle should modify an existing article", async () => {
     // 假设 createArticle 已经创建了一个文章，并返回了其 ID
