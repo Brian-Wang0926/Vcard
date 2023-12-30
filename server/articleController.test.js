@@ -2,14 +2,18 @@ require("dotenv").config();
 const request = require("supertest");
 const app = require("./app"); // 指向您的 Express 應用
 const mongoose = require("mongoose");
+const { MongoMemoryServer } = require('mongodb-memory-server');
 const Article = require("./models/article-model"); // 路徑可能需要調整
 const jwt = require("jsonwebtoken");
-const redisClient = require("./redis-client");
 
+let mongoServer;
 let articleId;
+
 // 測試前的設置
 beforeAll(async () => {
-  await mongoose.connect(process.env.MONGODB_URI, {
+  mongoServer = await MongoMemoryServer.create();
+  const mongoUri = mongoServer.getUri();
+  await mongoose.connect(mongoUri, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
   });
@@ -17,10 +21,8 @@ beforeAll(async () => {
 
 // 測試後的清理
 afterAll(async () => {
-  await mongoose.connection.close();
-  if (redisClient) {
-    await redisClient.quit();
-  }
+  await mongoose.disconnect();
+  await mongoServer.stop();
 });
 
 describe("Article Controller", () => {
