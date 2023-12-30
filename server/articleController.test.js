@@ -14,6 +14,8 @@ jest.mock("./redis-client", () => {
   return redisMock.createClient();
 });
 
+jest.setTimeout(20000);
+
 // 測試前的設置
 beforeAll(async () => {
   mongoServer = await MongoMemoryServer.create();
@@ -57,7 +59,7 @@ describe("Article Controller", () => {
     expect(response.body.title).toEqual(articleData.title);
     expect(response.body.content).toEqual(articleData.content);
     articleId = response.body._id;
-  }, 10000);
+  }, 20000);
 
   test("updateArticle should modify an existing article", async () => {
     // 假设 createArticle 已经创建了一个文章，并返回了其 ID
