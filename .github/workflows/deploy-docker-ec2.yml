@@ -1,123 +1,4 @@
-# name: CI/CD Pipeline
-
-# on:
-#   push:
-#     branches:
-#       - develop
-
-# jobs:
-#   test:
-#     runs-on: ubuntu-latest
-#     services:
-#       mongodb:
-#         image: mongo
-#         ports:
-#           - 27017:27017
-#         options: >-
-#           --health-cmd "mongo --eval 'db.stats()' --quiet"
-#           --health-interval 10s
-#           --health-timeout 5s
-#           --health-retries 5
-#       redis:
-#         image: redis
-#         ports:
-#           - 6379:6379
-#         options: >-
-#           --health-cmd "redis-cli ping"
-#           --health-interval 10s
-#           --health-timeout 5s
-#           --health-retries 5
-#     steps:
-#       - name: Checkout Repository
-#         uses: actions/checkout@v2
-
-#       - name: Setup Node.js
-#         uses: actions/setup-node@v2
-#         with:
-#           node-version: "14" # 或您项目所使用的Node.js版本
-
-#       - name: Install Backend Dependencies
-#         run: cd server && npm install
-
-#       - name: Run Tests
-#         run: cd server && npm test -- articleController.test.js
-#         env:
-#           YOUR_AWS_REGION: ${{ secrets.YOUR_AWS_REGION }}
-#           YOUR_AWS_ACCESS_KEY: ${{ secrets.YOUR_AWS_ACCESS_KEY }}
-#           YOUR_AWS_SECRET_KEY: ${{ secrets.YOUR_AWS_SECRET_KEY }}
-#           YOUR_S3_BUCKET_NAME: ${{ secrets.YOUR_S3_BUCKET_NAME }}
-#           CLOUDFRONT_URL: ${{ secrets.CLOUDFRONT_URL }}
-#           GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
-#           GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
-#           JWT_SECRET: ${{ secrets.JWT_SECRET }}
-#           MONGODB_URI: ${{ secrets.MONGODB_URI }}
-#           APP_URI: ${{ secrets.APP_URI }}
-#           BACKEND_URI: ${{ secrets.BACKEND_URI }}
-#           REDIS_HOST: ${{ secrets.REDIS_HOST }}
-#           REDIS_PORT: ${{ secrets.REDIS_PORT }}
-#           RABBITMQ_URL: ${{ secrets.RABBITMQ_URL }}
-
-#   build-and-push:
-#     needs: test
-#     runs-on: ubuntu-latest
-#     steps:
-#       - name: Checkout Repository
-#         uses: actions/checkout@v2
-
-#       - name: Cache Frontend node modules
-#         uses: actions/cache@v2
-#         with:
-#           path: client/node_modules
-#           key: ${{ runner.os }}-frontend-node-${{ hashFiles('client/package-lock.json') }}
-#           restore-keys: |
-#             ${{ runner.os }}-frontend-node-
-
-#       - name: Cache Backend node modules
-#         uses: actions/cache@v2
-#         with:
-#           path: server/node_modules
-#           key: ${{ runner.os }}-backend-node-${{ hashFiles('server/package-lock.json') }}
-#           restore-keys: |
-#             ${{ runner.os }}-backend-node-
-
-#       - name: Set up Docker Buildx
-#         uses: docker/setup-buildx-action@v1
-
-#       - name: Login to DockerHub
-#         uses: docker/login-action@v1
-#         with:
-#           username: ${{ secrets.DOCKER_HUB_USERNAME }}
-#           password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
-
-#       - name: Build and push frontend Docker image
-#         run: |
-#           docker buildx build \
-#             --platform linux/amd64 \
-#             --build-arg REACT_APP_API_URL: ${{ secrets.REACT_APP_API_URL }} \
-#             --build-arg REACT_APP_MOCK_ENV: ${{ secrets.REACT_APP_MOCK_ENV }} \
-#             --build-arg REACT_APP_CLOUDFRONT_URL: ${{ secrets.REACT_APP_CLOUDFRONT_URL }} \
-#             -t boyuan0926/frontend:latest \
-#             --push -f client/Dockerfile client
-
-#       - name: Build and push backend Docker image
-#         run: |
-#           docker buildx build --platform linux/amd64 -t boyuan0926/backend:latest --push -f server/Dockerfile server
-
-#   deploy:
-#     needs: build-and-push
-#     runs-on: ubuntu-latest
-#     steps:
-#       - name: executing remote ssh commands
-#         uses: appleboy/ssh-action@master
-#         with:
-#           host: ${{ secrets.SSH_HOST }}
-#           username: ec2-user
-#           key: ${{ secrets.SSH_PRIVATE_KEY }}
-#           script: |
-#             docker-compose pull
-#             docker-compose up -d --build --remove-orphans
-
-name: MongoDB Service Test
+name: CI/CD Pipeline
 
 on:
   push:
@@ -125,32 +6,93 @@ on:
       - develop
 
 jobs:
-  test-mongodb:
+  test:
     runs-on: ubuntu-latest
-    services:
-      mongodb:
-        image: mongo
-        ports:
-          - 27017:27017
-        options: >-
-          --health-cmd "mongo --eval 'db.stats()' --quiet"
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v2
 
-      - name: Wait for MongoDB to be ready
-        run: |
-          for i in {1..10}; do
-            mongo --eval 'db.stats()' --quiet && break
-            echo "Waiting for MongoDB to be ready..."
-            sleep 5
-          done
+      - name: Setup Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: "14" # 或您项目所使用的Node.js版本
 
-      - name: Test MongoDB Connection
+      - name: Install Backend Dependencies
+        run: cd server && npm install
+
+      - name: Run Tests
+        run: cd server && npm test -- articleController.test.js
+        env:
+          YOUR_AWS_REGION: ${{ secrets.YOUR_AWS_REGION }}
+          YOUR_AWS_ACCESS_KEY: ${{ secrets.YOUR_AWS_ACCESS_KEY }}
+          YOUR_AWS_SECRET_KEY: ${{ secrets.YOUR_AWS_SECRET_KEY }}
+          YOUR_S3_BUCKET_NAME: ${{ secrets.YOUR_S3_BUCKET_NAME }}
+          CLOUDFRONT_URL: ${{ secrets.CLOUDFRONT_URL }}
+          GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
+          GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
+          APP_URI: ${{ secrets.APP_URI }}
+          BACKEND_URI: ${{ secrets.BACKEND_URI }}
+          REDIS_HOST: ${{ secrets.REDIS_HOST }}
+          REDIS_PORT: ${{ secrets.REDIS_PORT }}
+          RABBITMQ_URL: ${{ secrets.RABBITMQ_URL }}
+
+  build-and-push:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Cache Frontend node modules
+        uses: actions/cache@v2
+        with:
+          path: client/node_modules
+          key: ${{ runner.os }}-frontend-node-${{ hashFiles('client/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-frontend-node-
+
+      - name: Cache Backend node modules
+        uses: actions/cache@v2
+        with:
+          path: server/node_modules
+          key: ${{ runner.os }}-backend-node-${{ hashFiles('server/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-backend-node-
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+
+      - name: Login to DockerHub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKER_HUB_USERNAME }}
+          password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+
+      - name: Build and push frontend Docker image
         run: |
-          mongo --eval 'db.runCommand({ ping: 1 })'
-          echo "MongoDB connection successful."
+          docker buildx build \
+            --platform linux/amd64 \
+            --build-arg REACT_APP_API_URL: ${{ secrets.REACT_APP_API_URL }} \
+            --build-arg REACT_APP_MOCK_ENV: ${{ secrets.REACT_APP_MOCK_ENV }} \
+            --build-arg REACT_APP_CLOUDFRONT_URL: ${{ secrets.REACT_APP_CLOUDFRONT_URL }} \
+            -t boyuan0926/frontend:latest \
+            --push -f client/Dockerfile client
+
+      - name: Build and push backend Docker image
+        run: |
+          docker buildx build --platform linux/amd64 -t boyuan0926/backend:latest --push -f server/Dockerfile server
+
+  deploy:
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    steps:
+      - name: executing remote ssh commands
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ec2-user
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            docker-compose pull
+            docker-compose up -d --build --remove-orphans
