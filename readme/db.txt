@@ -1,0 +1,63 @@
+Table Article {
+  _id ObjectId [pk]
+  title String [not null]
+  content String [not null]
+  author ObjectId [ref: > User._id]
+  board ObjectId [ref: > Board._id]
+  commentCount Number
+  likes ObjectId [ref: > User._id]
+  createdAt Date
+  updatedAt Date
+}
+
+Table Board {
+  _id ObjectId [pk]
+  name String [not null]
+  englishName String [not null]
+  icon String [not null]
+  createdAt Date
+}
+
+Table Card {
+  _id ObjectId [pk]
+  userID1 ObjectId [ref: > User._id]
+  userID2 ObjectId [ref: > User._id]
+  date Date
+  status Boolean
+  acceptedBy ObjectId [ref: > User._id]
+  expiryDate Date
+}
+
+Table Comment {
+  _id ObjectId [pk]
+  text String [not null]
+  author ObjectId [ref: > User._id]
+  article ObjectId [ref: > Article._id]
+  likes ObjectId [ref: > User._id]
+  likeCount Number
+  createdAt Date
+  updatedAt Date
+}
+
+Table Chat {
+  _id ObjectId [pk]
+  fromUserId ObjectId [ref: > User._id]
+  toUserId ObjectId [ref: > User._id]
+  message String [not null]
+  createdAt Date
+}
+
+Table User {
+  _id ObjectId [pk]
+  name String [not null]
+  googleID String
+  email String [not null]
+  thumbnail String
+  savedArticles ObjectId [ref: > Article._id]
+  date Date
+  lastActiveDate Date
+  eligibleForCard Boolean
+  cardsDrawn ObjectId [ref: > User._id]
+  friends ObjectId [ref: > User._id]
+  subscribedBoards ObjectId [ref: > Board._id]
+}
