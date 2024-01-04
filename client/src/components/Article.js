@@ -16,8 +16,8 @@ const Article = ({ article, onArticleClick }) => {
         <div className="text-sm text-gray-700 py-1">
           {article.board.name} / {formattedDate}
         </div>
-        <div className="text-lg truncate ...">{article.title}</div>
-        <div className="text-sm truncate ...">{article.content}</div>
+        <div className="text-lg truncate max-w-[833px] ...">{article.title}</div>
+        <div className="text-sm truncate max-w-[833px] ...">{article.content}</div>
         <div className="flex items-center text-sm text-gray-500 mt-2 overflow-hidden ">
           <div className="flex items-center cursor-default ">
             <img src={LikeRed} alt="like button" className="h-4 w-4 mr-2" />
