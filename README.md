@@ -1,5 +1,22 @@
 # Vcard
 
+<!-- PORTFOLIO:START -->
+<!-- Generated from content/projects/vcard.mdx — edit there, then run `pnpm sync-readme`. -->
+
+> Dating and social matching platform with a forum, matching engine and real-time chat.
+
+**Case study** — <https://brianwang.vercel.app/projects/vcard>
+
+**Stack:** `React` `Node.js` `Express` `MongoDB` `Socket.IO` `AWS`
+
+### Highlights
+
+- Built a full social matching platform solo, from planning through AWS deployment
+- Real-time chat over Socket.IO with Redis caching behind it
+- Deployed with Docker, CI/CD, Nginx and SSL
+
+<!-- PORTFOLIO:END -->
+
 ## [DEMO : Vcard ](https://vcard.myvcard.xyz/)
 
 Vcard 是一個參考 Dcard 製作的交友配對社群平台，主要功能如下：
