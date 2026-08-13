@@ -3,17 +3,18 @@
 <!-- PORTFOLIO:START -->
 <!-- Generated from content/projects/vcard.mdx — edit there, then run `pnpm sync-readme`. -->
 
-> Dating and social matching platform with a forum, matching engine and real-time chat.
+> Social matching platform — MongoDB data model, Socket.IO messaging over Redis, and a containerised AWS deployment.
 
 **Case study** — <https://brianwang.vercel.app/projects/vcard>
 
-**Stack:** `React` `Node.js` `Express` `MongoDB` `Socket.IO` `AWS`
+**Stack:** `Node.js` `Express` `MongoDB` `Socket.IO` `Redis` `AWS`
 
 ### Highlights
 
-- Built a full social matching platform solo, from planning through AWS deployment
-- Real-time chat over Socket.IO with Redis caching behind it
-- Deployed with Docker, CI/CD, Nginx and SSL
+- Designed the MongoDB data model and REST API for members, posts, matching and messaging
+- Built real-time chat on Socket.IO with Redis caching behind it
+- Implemented Google OAuth and JWT auth over an MVC service layer
+- Deployed on AWS with Docker, CI/CD, Nginx reverse proxy and SSL
 
 <!-- PORTFOLIO:END -->
 
